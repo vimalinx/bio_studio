@@ -101,11 +101,11 @@ bio_studio/
 
 ## 📝 开发日志
 
-**v2.1 (2026-01-24)**:
-- 🚀 **AI 升级**: 集成 Evo 2 (1B) 模型，跑通 Variant Effect Prediction 流程。
-- 🛠️ **环境补全**: 安装 STAR, MultiQC, Fastp, SeqKit 等 10+ 核心工具。
-- 📚 **文档治理**: 新增 BEST_PRACTICES.md 和 ENVIRONMENT.md。
-- 🐛 **Bug修复**: 修复 `subprocess` PATH 环境变量丢失问题。
+**v2.1 (2026-01-28)**:
+- 🚀 **实战验证**: 完成酵母菌全流程 RNA-seq 分析 (STAR + featureCounts + Variant Calling)。
+- 🧪 **自动化测试**: 建立 `test_env_validation` 环境，一键验证核心工具链状态。
+- 🧹 **架构治理**: 实施严格的根目录洁癖策略，归档旧数据，确立 "Federal" 联邦制项目架构。
+- 🐛 **脚本修复**: 修正 Evo 2 显存管理、BCFtools 变异检测流程及多个可视化脚本 Bug。
 
 **v2.0 (2025-01-22)**:
 - ✨ 重构：项目独立架构
