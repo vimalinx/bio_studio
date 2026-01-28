@@ -1,0 +1,18 @@
+[project]
+name = "bio-database-mcp"
+version = "0.1.0"
+description = "Bio Database Query MCP Server - 提供生物数据库查询功能"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "mcp>=0.9.0",
+    "biopython>=1.83",
+    "requests>=2.31.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+bio-database-mcp = "database_server:main"

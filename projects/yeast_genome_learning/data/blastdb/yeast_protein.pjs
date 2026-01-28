@@ -1,0 +1,24 @@
+{
+  "version": "1.2",
+  "dbname": "yeast_protein",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "Saccharomyces cerevisiae proteins",
+  "number-of-letters": 2914067,
+  "number-of-sequences": 6600,
+  "last-updated": "2026-01-25T11:06:00",
+  "number-of-volumes": 1,
+  "bytes-total": 6571654,
+  "bytes-to-cache": 2973588,
+  "files": [
+    "yeast_protein.pdb",
+    "yeast_protein.phr",
+    "yeast_protein.pin",
+    "yeast_protein.pog",
+    "yeast_protein.pos",
+    "yeast_protein.pot",
+    "yeast_protein.psq",
+    "yeast_protein.ptf",
+    "yeast_protein.pto"
+  ]
+}

@@ -1,0 +1,95 @@
+  1️⃣ 测试安装
+
+  # 测试 evo2_7b 模型
+  python -m evo2.test.test_evo2_generation --model_name evo2_7b
+
+  # 测试 evo2_40b 模型（需要多GPU）
+  python -m evo2.test.test_evo2_generation --model_name evo2_40b
+
+  2️⃣ Python 脚本生成DNA序列
+
+  # 加载模型（在容器内的Python环境中）
+  from evo2 import Evo2
+
+  # 使用 evo2_1b_base 模型（1B参数版本）
+  evo2_model = Evo2('evo2_1b_base')
+
+  # 生成100长度DNA序列
+  output = evo2_model.generate(
+      prompt_seqs=[ACGT],
+      n_tokens=100,
+      temperature=1.0,
+      top_k=4
+  )
+  print(output.sequences[0])
+
+  # 生成800长度DNA序列
+  output = evo2_model.generate(
+      prompt_seqs=[ACGT],
+      n_tokens=800,
+      temperature=1.0,
+      top_k=4
+  )
+  print(output.sequences[0])
+
+  # 生成1800长度DNA序列
+  output = evo2_model.generate(
+      prompt_seqs=[ACGT],
+      n_tokens=1800,
+      temperature=1.0,
+      top_k=4
+  )
+  print(output.sequences[0])
+
+  # 生成10000长度DNA序列
+  output = evo2_model.generate(
+      prompt_seqs=[ACGT],
+      n_tokens=10000,
+      temperature=1.0,
+      top_k=4
+  )
+  print(output.sequences[0])
+
+  3️⃣ 容器内常用命令
+
+  # 进入容器后
+  cd /workdir
+
+  # 查看Python版本
+  python3 --version
+
+  # 查看已安装的包
+  pip list | grep evo2
+
+  # 退出容器
+  exit
+
+  4️⃣ 模型下载
+
+  模型会在首次使用时自动从 HuggingFace 下载到：
+  - 容器内：/root/.cache/huggingface/
+  - 宿主机映射：~/huggingface_cache/
+
+  可用模型：
+  - evo2_1b_base - 1B参数，8K上下文
+  - evo2_7b_base - 7B参数，8K上下文
+  - evo2_7b - 7B参数，1M上下文
+  - evo2_40b_base - 40B参数，8K上下文
+  - evo2_40b - 40B参数，1M上下文（需要多GPU）
+
+  5️⃣ 运行容器的完整流程
+
+  # 1. 运行容器
+  docker run -it --rm --gpus all     -v ~/huggingface_cache:/root/.cache/huggingface     evo2 bash
+
+  # 2. 进入容器后测试
+  python -m evo2.test.test_evo2_generation --model_name evo2_1b_base
+
+  # 3. 运行Python脚本生成DNA
+  python3 << 'EOF'
+  from evo2 import Evo2
+  model = Evo2('evo2_1b_base')
+  output = model.generate(prompt_seqs=[ACGT], n_tokens=100, temperature=1.0, top_k=4)
+  print(output.sequences[0])
+  EOF
+

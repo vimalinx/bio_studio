@@ -1,0 +1,8 @@
+# Additional development requirements for profile management
+# These are optional dependencies for enhanced functionality
+
+# For better terminal UI (optional)
+# rich>=13.0.0
+
+# For interactive prompts (optional)
+# prompt-toolkit>=3.0.0

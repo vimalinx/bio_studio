@@ -1,0 +1,74 @@
+STAR version=2.7.11b
+STAR compilation time,server,dir=2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+##### Command Line:
+/home/vimalinx/miniforge3/envs/bio/bin/STAR-avx2 --genomeDir test_env_validation/data/references/star_index --readFilesIn test_env_validation/data/raw/test_reads_R1.fq --outFileNamePrefix test_env_validation/results/star_
+##### Initial USER parameters from Command Line:
+outFileNamePrefix                 test_env_validation/results/star_
+###### All USER parameters from Command Line:
+genomeDir                     test_env_validation/data/references/star_index     ~RE-DEFINED
+readFilesIn                   test_env_validation/data/raw/test_reads_R1.fq        ~RE-DEFINED
+outFileNamePrefix             test_env_validation/results/star_     ~RE-DEFINED
+##### Finished reading parameters from all sources
+
+##### Final user re-defined parameters-----------------:
+genomeDir                         test_env_validation/data/references/star_index
+readFilesIn                       test_env_validation/data/raw/test_reads_R1.fq   
+outFileNamePrefix                 test_env_validation/results/star_
+
+-------------------------------
+##### Final effective command line:
+/home/vimalinx/miniforge3/envs/bio/bin/STAR-avx2   --genomeDir test_env_validation/data/references/star_index   --readFilesIn test_env_validation/data/raw/test_reads_R1.fq      --outFileNamePrefix test_env_validation/results/star_
+----------------------------------------
+
+Number of fastq files for each mate = 1
+ParametersSolo: --soloCellFilterType CellRanger2.2 filtering parameters:  3000 0.99 10
+Finished loading and checking parameters
+Reading genome generation parameters:
+### /home/vimalinx/miniforge3/envs/bio/bin/STAR-avx2   --runMode genomeGenerate      --genomeDir test_env_validation/data/references/star_index   --genomeFastaFiles test_env_validation/data/references/tiny_genome.fa      --genomeSAindexNbases 2
+### GstrandBit=32
+versionGenome                 2.7.4a     ~RE-DEFINED
+genomeType                    Full     ~RE-DEFINED
+genomeFastaFiles              test_env_validation/data/references/tiny_genome.fa        ~RE-DEFINED
+genomeSAindexNbases           2     ~RE-DEFINED
+genomeChrBinNbits             18     ~RE-DEFINED
+genomeSAsparseD               1     ~RE-DEFINED
+genomeTransformType           None     ~RE-DEFINED
+genomeTransformVCF            -     ~RE-DEFINED
+sjdbOverhang                  0     ~RE-DEFINED
+sjdbFileChrStartEnd           -        ~RE-DEFINED
+sjdbGTFfile                   -     ~RE-DEFINED
+sjdbGTFchrPrefix              -     ~RE-DEFINED
+sjdbGTFfeatureExon            exon     ~RE-DEFINED
+sjdbGTFtagExonParentTranscripttranscript_id     ~RE-DEFINED
+sjdbGTFtagExonParentGene      gene_id     ~RE-DEFINED
+sjdbInsertSave                Basic     ~RE-DEFINED
+genomeFileSizes               524288   2115        ~RE-DEFINED
+Genome version is compatible with current STAR
+Number of real (reference) chromosomes= 2
+1	chr1	128	0
+2	chr2	128	262144
+Started loading the genome: Wed Jan 28 17:07:38 2026
+
+Genome: size given as a parameter = 524288
+SA: size given as a parameter = 2115
+SAindex: size given as a parameter = 1
+Read from SAindex: pGe.gSAindexNbases=2  nSAi=20
+nGenome=524288;  nSAbyte=2115
+GstrandBit=32   SA number of indices=512
+Shared memory is not used for genomes. Allocated a private copy of the genome.
+Genome file size: 524288 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading Genome ... done! state: good=1 eof=0 fail=0 bad=0; loaded 524288 bytes
+SA file size: 2115 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading SA ... done! state: good=1 eof=0 fail=0 bad=0; loaded 2115 bytes
+Loading SAindex ... done: 123 bytes
+Finished loading the genome: Wed Jan 28 17:07:38 2026
+
+alignIntronMax=alignMatesGapMax=0, the max intron size will be approximately determined by (2^winBinNbits)*winAnchorDistNbins=589824
+Thread #0 end of input stream, nextChar=-1
+Completed: thread #0
+Jan 28 17:07:38 ..... finished mapping
+RAM after mapping:
+VmPeak:	  161856 kB; VmSize:	  161856 kB; VmHWM:	  107484 kB; VmRSS:	  107484 kB; 
+RAM after freeing genome index memory:
+VmPeak:	  161856 kB; VmSize:	  161340 kB; VmHWM:	  107456 kB; VmRSS:	  106972 kB; 
+ALL DONE!

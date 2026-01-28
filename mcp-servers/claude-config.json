@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "bio-sequence": {
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": [
+        "/run/media/vimalinx/Data/bio_studio/mcp-servers/bio-sequence-mcp/sequence_server.py"
+      ],
+      "description": "DNA/RNA/蛋白质序列分析"
+    },
+    "bio-structure": {
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": [
+        "/run/media/vimalinx/Data/bio_studio/mcp-servers/bio-structure-mcp/structure_server.py"
+      ],
+      "description": "蛋白质结构分析和预测"
+    },
+    "bio-database": {
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": [
+        "/run/media/vimalinx/Data/bio_studio/mcp-servers/bio-database-mcp/database_server.py"
+      ],
+      "description": "生物数据库查询（NCBI、UniProt等）"
+    }
+  }
+}

@@ -1,0 +1,89 @@
+# Bio Studio .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# 数据文件（大文件 - 全局规则）
+**/data/raw/*
+**/data/processed/*
+**/data/results/*
+**/data/references/*
+**/data/models/*
+!**/data/.gitkeep
+
+# 结果
+# data/results/* (Covered by above)
+# !data/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# AI模型缓存
+.cache/
+*.pth
+*.pt
+*.pkl
+*.h5
+
+# 临时文件
+*.tmp
+*.log
+.DS_Store
+
+# 大文件
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+
+# huggingface缓存
+evo2/huggingface_cache/
+repositories/active/evo2/huggingface_cache/
+
+# Linter 缓存
+.ruff_cache/
+.mypy_cache/
+
+# 临时目录
+tmp/
+
+# 保留目录结构
+!.gitkeep
+data/*/.gitkeep
+
+
+# Legacy Archive
+_legacy_workspace_v1/
+
+# Large Bio Files (General Safety)
+*.bam
+*.bai
+*.sam
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.fa
+*.fna
+*.faa
+*.gff
+*.gtf
+

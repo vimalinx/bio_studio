@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  evo2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: evo2:latest
+    container_name: evo2-analysis
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      # Persist HuggingFace models cache
+      - ./huggingface_cache:/root/.cache/huggingface
+      # Mount bio_studio data directories
+      - /media/vimalinx/Data/bio_studio/shared_data:/workdir/shared_data
+      - /media/vimalinx/Data/bio_studio/projects:/workdir/projects
+      # Mount current evo2 directory (for scripts)
+      - .:/workdir/evo2_code
+    shm_size: '16gb'
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    stdin_open: true
+    tty: true
+    command: bash

@@ -1,0 +1,2 @@
+chr1	Test	gene	1	64	.	+	.	ID=gene1;Name=TestGene1
+chr2	Test	gene	1	64	.	-	.	ID=gene2;Name=TestGene2

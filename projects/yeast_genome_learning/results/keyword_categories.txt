@@ -1,0 +1,11 @@
+代谢|metabolism, enzyme, catalyz, biosynthesis, pathway
+转录|transcription, regulator, factor, rna, polymerase
+翻译|translation, ribosome, trna, protein synthesis
+运输|transport, transporter, carrier, channel
+细胞周期|cycle, division, checkpoint, spindle
+DNA修复|dna repair, replication, recombination
+应激响应|stress, response, heat, cold, shock
+线粒体|mitochondrial, respiration, oxidative
+分泌|secretion, vesicle, golgi, er
+细胞骨架|cytoskeleton, actin, tubulin, myosin
+信号|signal, signaling, kinase, phosphatase

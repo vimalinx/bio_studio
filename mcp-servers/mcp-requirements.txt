@@ -1,0 +1,18 @@
+# MCP Server Dependencies
+# 安装所有MCP服务器所需的依赖
+
+# MCP核心
+mcp>=0.9.0
+
+# 生物信息学
+biopython>=1.83
+
+# 数值计算
+numpy>=1.24.0
+
+# 结构预测（可选）
+fair-esm>=2.0.0
+torch>=2.0.0
+
+# 数据库API
+requests>=2.31.0

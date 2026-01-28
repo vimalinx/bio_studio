@@ -1,0 +1,30 @@
+🍺 酵母菌基因功能分析报告
+========================================
+
+📊 基因组基本信息:
+物种: Saccharomyces cerevisiae (酿酒酵母)
+菌株: S288C
+版本: R64-1-1
+
+基因总数: 6600
+蛋白编码基因: 1
+非编码RNA: 424
+
+📈 主要功能类别:
+-----------------------
+
+EOF
+
+cat "/home/vimalinx/bio_studio/projects/yeast_genome_learning/results/keyword_categories.txt" >> "/home/vimalinx/bio_studio/projects/yeast_genome_learning/results/gene_analysis_summary.txt"
+echo "" >> "/home/vimalinx/bio_studio/projects/yeast_genome_learning/results/gene_analysis_summary.txt"
+
+echo "✅ 分析完成！"
+echo ""
+echo "📁 结果文件:"
+echo "   - 所有基因: /home/vimalinx/bio_studio/projects/yeast_genome_learning/results/all_genes.txt"
+echo "   - 详细报告: /home/vimalinx/bio_studio/projects/yeast_genome_learning/results/gene_analysis_summary.txt"
+echo ""
+echo "💡 查看特定基因:"
+echo "   grep 'ACT1' /home/vimalinx/bio_studio/projects/yeast_genome_learning/results/all_genes.txt"
+echo "   grep 'kinase' /home/vimalinx/bio_studio/projects/yeast_genome_learning/results/all_genes.txt"
+echo ""

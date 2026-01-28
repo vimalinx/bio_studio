@@ -1,0 +1,56 @@
+🍺 酵母菌基因组数据库 - 安装完成报告
+=========================================
+
+📅 安装日期: $(date)
+📁 数据目录: ~/bio_studio/projects/yeast_genome_learning/data/
+
+📊 数据统计:
+
+基因组:
+
+基因组大小:
+总计: 0.00 Mb
+
+染色体数量: 17 (16核染色体 + 线粒体)
+基因数量: 6,017 (蛋白编码)
+蛋白质序列: 6,600
+
+📁 文件列表:
+5.6M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/annotation/genomic.gff
+1.1M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/annotation/genomic.gff.gz
+1.6M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/annotation/SGD_features.tab
+32K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.ndb
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.nhr
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.nin
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.njs
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.nog
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.nos
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.not
+3.0M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.nsq
+16K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.ntf
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_genome.nto
+180K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pdb
+3.1M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.phr
+52K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pin
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pjs
+28K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pog
+108K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pos
+80K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pot
+2.8M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.psq
+16K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.ptf
+28K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/blastdb/yeast_protein.pto
+5.7M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/proteins/protein.faa
+2.6M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/proteins/protein.faa.gz
+12M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/sequence/genomic.fna
+4.0K	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/sequence/genomic.fna.fai
+3.7M	/home/vimalinx/bio_studio/projects/yeast_genome_learning/data/sequence/genomic.fna.gz
+
+🔍 验证测试 - ACT1 基因:
+基因ID: YFL039C
+标准名称: ACT1 (肌动蛋白)
+染色体: VI
+位置: 53260-54696
+长度: 1,437 bp
+
+✅ 状态: 所有组件安装成功
+💣 BLAST: 核苷酸和蛋白质数据库已创建

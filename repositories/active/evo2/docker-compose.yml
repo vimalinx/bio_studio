@@ -1,0 +1,28 @@
+# Evo2 Docker Compose Configuration
+# Usage: docker compose run --rm evo2 bash
+
+services:
+  evo2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: evo2:latest
+    container_name: evo2-container
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      # Persist HuggingFace models cache
+      - ./huggingface_cache:/root/.cache/huggingface
+      # Mount working directory for code
+      - .:/workdir
+    shm_size: '16gb'
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    stdin_open: true
+    tty: true
+    command: bash
