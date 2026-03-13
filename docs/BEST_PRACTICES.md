@@ -19,9 +19,15 @@ When running Python scripts that invoke shell commands (via `subprocess`) in non
 import os
 
 # Crucial for non-interactive shells
-CONDA_BIN = "/home/vimalinx/miniforge3/envs/bio/bin"
-if CONDA_BIN not in os.environ["PATH"]:
-    os.environ["PATH"] = f"{CONDA_BIN}:{os.environ.get('PATH', '')}"
+conda_prefix = os.environ.get("CONDA_PREFIX")
+conda_bin = os.path.join(conda_prefix, "bin") if conda_prefix else None
+
+# Fallback for environments where CONDA_PREFIX is not set (adjust as needed)
+if not conda_bin:
+    conda_bin = "/path/to/envs/bio/bin"
+
+if conda_bin and conda_bin not in os.environ.get("PATH", ""):
+    os.environ["PATH"] = f"{conda_bin}:{os.environ.get('PATH', '')}"
 ```
 
 **Rule**: Do not assume the environment is activated. Enforce it in the code.

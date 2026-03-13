@@ -43,6 +43,9 @@ python lib/create_project.py <项目名> --type <类型>
 - 更新 `config.py`（路径、样本、参考）
 - 编写/更新 `pipeline.py`
 
+建议：Notebook 仅用于临时探索；可复现逻辑应落在 `scripts/`。
+（仓库默认忽略 `*.ipynb`，避免把大量中间探索文件提交进版本库。）
+
 ### 5. 运行与记录
 - 运行分析脚本
 - 关键输出写入 `projects/<项目名>/logs/`

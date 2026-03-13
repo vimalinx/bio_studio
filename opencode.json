@@ -5,28 +5,25 @@
             "type": "local",
             "command": [
                 "/home/vimalinx/miniforge3/envs/bio/bin/python",
-                "/home/vimalinx/bio_studio/mcp-servers/bio-sequence-mcp/sequence_server.py"
+                "/run/media/vimalinx/Data/bio_studio/mcp-servers/bio-sequence-mcp/sequence_server.py"
             ],
-            "enabled": true,
-            "description": "DNA/RNA/蛋白质序列分析"
+            "enabled": true
         },
         "bio-structure": {
             "type": "local",
             "command": [
                 "/home/vimalinx/miniforge3/envs/bio/bin/python",
-                "/home/vimalinx/bio_studio/mcp-servers/bio-structure-mcp/structure_server.py"
+                "/run/media/vimalinx/Data/bio_studio/mcp-servers/bio-structure-mcp/structure_server.py"
             ],
-            "enabled": true,
-            "description": "蛋白质结构分析和预测"
+            "enabled": true
         },
         "bio-database": {
             "type": "local",
             "command": [
                 "/home/vimalinx/miniforge3/envs/bio/bin/python",
-                "/home/vimalinx/bio_studio/mcp-servers/bio-database-mcp/database_server.py"
+                "/run/media/vimalinx/Data/bio_studio/mcp-servers/bio-database-mcp/database_server.py"
             ],
-            "enabled": true,
-            "description": "生物数据库查询（NCBI、UniProt等）"
+            "enabled": true
         },
         "bio-rag": {
             "type": "local",
@@ -34,21 +31,9 @@
                 "npx",
                 "-y",
                 "mcp-local-rag@latest",
-                "/home/vimalinx/bio_studio/docs"
+                "/run/media/vimalinx/Data/bio_studio/docs"
             ],
-            "enabled": true,
-            "description": "生物工作室文档 RAG 知识库"
-        },
-        "bio-rag-data": {
-            "type": "local",
-            "command": [
-                "npx",
-                "-y",
-                "mcp-local-rag@latest",
-                "/home/vimalinx/bio_studio/data"
-            ],
-            "enabled": true,
-            "description": "生物数据集 RAG 知识库"
+            "enabled": false
         }
     }
 }

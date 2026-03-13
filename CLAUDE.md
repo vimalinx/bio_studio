@@ -110,7 +110,7 @@ rm -rf repositories/active/<工具名>
 ## 🔧 环境信息
 
 - **Conda 环境**: `bio` (主环境)
-- **激活命令**: `source ~/miniforge3/bin/activate bio`
+- **激活命令**: `conda activate bio` 或 `source <conda_install>/bin/activate bio`（conda 安装路径可能不同）
 - **Python**: 3.10.x
 - **GPU**: RTX 5070 Ti (CUDA 可用)
 
@@ -119,8 +119,9 @@ rm -rf repositories/active/<工具名>
 
 ```python
 import os
-CONDA_BIN = "/home/vimalinx/miniforge3/envs/bio/bin"
-os.environ["PATH"] = f"{CONDA_BIN}:{os.environ.get('PATH', '')}"
+conda_prefix = os.environ.get("CONDA_PREFIX")
+conda_bin = f"{conda_prefix}/bin" if conda_prefix else "/path/to/envs/bio/bin"
+os.environ["PATH"] = f"{conda_bin}:{os.environ.get('PATH', '')}"
 ```
 
 ## 📝 变更日志位置

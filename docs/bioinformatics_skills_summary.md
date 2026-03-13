@@ -76,6 +76,6 @@ Bio Studio uses an "Intent-Based" skill system. You don't need to remember flags
 
 ## 📂 Environment Paths
 
-- **Conda Env**: `/home/vimalinx/miniforge3/envs/bio/bin/` (Add to PATH in scripts!)
+- **Conda Env**: Use the active env `CONDA_PREFIX/bin` (or set `BIO_STUDIO_CONDA_BIN=/path/to/envs/bio/bin` for non-interactive scripts)
 - **AI Models**: `docker run evo2:latest`
 - **Reference Data**: `shared_data/references/`

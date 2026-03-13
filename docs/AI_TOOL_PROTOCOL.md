@@ -89,7 +89,11 @@ python scripts/maintenance/generate_env_report.py
 
 **步骤 2.2: 激活环境**
 ```bash
-source ~/miniforge3/bin/activate bio
+# 方式 1：如果 conda 已初始化
+conda activate bio
+
+# 方式 2：使用 activate 脚本（conda 安装路径可能不同）
+source <conda_install>/bin/activate bio
 ```
 
 ---
@@ -125,6 +129,13 @@ pip install -r requirements.txt  # 如果有
 pip install -e .  # 如果是 Python 包
 
 # 3. 或者按官方文档安装
+```
+
+补充：如果希望外部工具仓库可复现（推荐），可将其作为 submodule 管理。
+
+```bash
+# 初次拉取仓库后（或新机器 clone 后）初始化 submodules
+git submodule update --init --recursive
 ```
 
 #### 方式 D: 二进制文件

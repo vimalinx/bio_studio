@@ -32,16 +32,22 @@ Bio Studio 是重构后的生物信息学工作区，核心改进：
 ## 🚀 5分钟快速开始
 
 ```bash
-# 1. 进入工作区
-cd ~/bio_studio
+# 1. 进入工作区（仓库根目录）
+cd /path/to/bio_studio
 
-# 2. 激活环境 (如果尚未激活)
-source ~/miniforge3/bin/activate bio
+# 2. 激活环境（conda 安装路径可能不同）
+# 如果你已经初始化了 conda：
+#   conda activate bio
+# 否则使用 activate 脚本：
+source <conda_install>/bin/activate bio
 
-# 3. 创建新项目
+# 3. 环境体检（生成/更新环境快照）
+python scripts/maintenance/generate_env_report.py
+
+# 4. 创建新项目
 python3 lib/create_project.py my_analysis --type rnaseq
 
-# 4. 运行分析
+# 5. 运行分析
 cd projects/my_analysis/scripts
 python pipeline.py
 ```
@@ -103,7 +109,7 @@ bio_studio/
 
 **v2.1 (2026-01-28)**:
 - 🚀 **实战验证**: 完成酵母菌全流程 RNA-seq 分析 (STAR + featureCounts + Variant Calling)。
-- 🧪 **自动化测试**: 建立 `test_env_validation` 环境，一键验证核心工具链状态。
+- 🧪 **自动化测试**: 建立 `projects/test_env_validation` 项目，一键验证核心工具链状态。
 - 🧹 **架构治理**: 实施严格的根目录洁癖策略，归档旧数据，确立 "Federal" 联邦制项目架构。
 - 🐛 **脚本修复**: 修正 Evo 2 显存管理、BCFtools 变异检测流程及多个可视化脚本 Bug。
 

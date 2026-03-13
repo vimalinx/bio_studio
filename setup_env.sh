@@ -27,13 +27,20 @@ source "$CONDA_BASE/etc/profile.d/conda.sh"
 echo "🚀 Creating/Updating 'bio' conda environment..."
 echo "   (This may take a few minutes depending on your internet connection)"
 
-# Create environment with Python 3.10 and core bioconda tools
-conda create -n bio -c conda-forge -c bioconda -y \
+# Prefer mamba (faster, more robust downloads) when available.
+SOLVER_EXE="$CONDA_EXE"
+if [ -x "$CONDA_BASE/bin/mamba" ]; then
+    SOLVER_EXE="$CONDA_BASE/bin/mamba"
+fi
+
+# Create environment with Python 3.10 and core bioconda tools.
+# Pin PyTorch to a CPU build to avoid multi-GB CUDA runtime downloads.
+"$SOLVER_EXE" create -n bio -c conda-forge -c bioconda -y \
     python=3.10 \
     blast bowtie2 bwa samtools bcftools vcftools bedtools \
     hmmer muscle clustalw iqtree fastqc seqtk \
     cutadapt biopython pandas numpy matplotlib seaborn jupyterlab ipywidgets \
-    pytorch
+    "pytorch=*=cpu_*"
 
 # 3. Activate and install Pip dependencies
 echo "📦 Installing PyPI dependencies..."
@@ -41,7 +48,7 @@ conda activate bio
 
 # Install remaining pip packages from requirements.txt
 # excluding ones we already installed via conda to speed up
-grep -vE "biopython|pandas|numpy|matplotlib|seaborn|jupyter|ipywidgets|cutadapt|torch" requirements.txt > requirements_pip.tmp
+grep -vE "biopython|pandas|numpy|matplotlib|seaborn|jupyter|ipywidgets|cutadapt|torch|seqtk" requirements.txt > requirements_pip.tmp
 
 pip install -r requirements_pip.tmp
 rm requirements_pip.tmp

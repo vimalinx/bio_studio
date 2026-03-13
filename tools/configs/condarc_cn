@@ -1,0 +1,22 @@
+channels:
+  # Use named channels so scripts that pass `-c conda-forge` still work.
+  - conda-forge
+  - bioconda
+  - defaults
+
+# Map named community channels (conda-forge/bioconda) to the mirror.
+channel_alias: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+
+# Map defaults (pkgs/main, pkgs/r, pkgs/msys2) to the mirror as well.
+default_channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+
+show_channel_urls: true
+ssl_verify: true
+
+# Make large downloads more resilient.
+remote_connect_timeout_secs: 60
+remote_read_timeout_secs: 120
+remote_max_retries: 10
