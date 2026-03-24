@@ -3,8 +3,11 @@
 """
 
 from pathlib import Path
+import shlex
 import subprocess
 import sys
+
+from ..workspace_env import build_subprocess_env
 
 
 def run_command(cmd, check=True, capture_output=True, **kwargs):
@@ -19,16 +22,25 @@ def run_command(cmd, check=True, capture_output=True, **kwargs):
     Returns:
         subprocess.CompletedProcess对象
     """
-    if isinstance(cmd, str):
-        cmd = cmd.split()
+    shell = kwargs.get("shell", False)
+    if isinstance(cmd, str) and not shell:
+        cmd = shlex.split(cmd)
+
+    env = build_subprocess_env(base_env=kwargs.pop("env", None))
 
     try:
         result = subprocess.run(
-            cmd, check=check, capture_output=capture_output, text=True, **kwargs
+            cmd,
+            check=check,
+            capture_output=capture_output,
+            text=True,
+            env=env,
+            **kwargs,
         )
         return result
     except subprocess.CalledProcessError as e:
-        print(f"命令执行失败: {' '.join(e.cmd)}")
+        failed_cmd = e.cmd if isinstance(e.cmd, str) else " ".join(e.cmd)
+        print(f"命令执行失败: {failed_cmd}")
         print(f"错误信息: {e.stderr}")
         raise
 

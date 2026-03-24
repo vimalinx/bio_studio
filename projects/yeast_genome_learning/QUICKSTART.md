@@ -1,5 +1,7 @@
 # 酵母菌基因组学习 - 快速开始
 
+> 这是学习项目，默认仍以 `scripts/*.sh` 作为主入口；`python scripts/pipeline.py --validate/--steps` 仅提供统一兼容面。
+
 ## 🚀 3分钟开始
 
 ```bash

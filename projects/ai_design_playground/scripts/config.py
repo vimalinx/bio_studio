@@ -2,25 +2,26 @@
 ai_design_playground 项目配置
 """
 
-# 项目配置
+from pathlib import Path
+
 PROJECT_NAME = "ai_design_playground"
 PROJECT_TYPE = "generic"
+PROJECT_DESCRIPTION = "In-silico playground: generate toy sequences, analyze, and validate with local tools/AI models."
 
-# 数据路径
-DATA_DIR = "data"
-RAW_DIR = f"{DATA_DIR}/raw"
-PROCESSED_DIR = f"{DATA_DIR}/processed"
-RESULTS_DIR = f"{DATA_DIR}/results"
-REFERENCES_DIR = f"{DATA_DIR}/references"
+SCRIPTS_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DIR = DATA_DIR / "raw"
+PROCESSED_DIR = DATA_DIR / "processed"
+RESULTS_DIR = DATA_DIR / "results"
+REFERENCES_DIR = DATA_DIR / "references"
+LOGS_DIR = PROJECT_ROOT / "logs"
+NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 
-# 样本配置
 SAMPLES = []
-
-# 参考基因组
 REFERENCE_GENOME = None
-
-# 工具配置
 THREADS = 4
+ANALYSIS_PARAMETERS = {}
 
 SAFETY_NOTICE = "In-silico only. Do not use outputs to create/modify organisms."
 

@@ -6,6 +6,63 @@ from pathlib import Path
 from .utils import run_command, ensure_dir, check_file_exists
 
 
+def run_fastp(
+    input_read1,
+    input_read2=None,
+    output_read1=None,
+    output_read2=None,
+    html_report=None,
+    json_report=None,
+    threads=4,
+    extra_args=None,
+):
+    """
+    运行 fastp 对 FASTQ 做过滤与质控
+
+    Args:
+        input_read1: R1 或单端 FASTQ
+        input_read2: R2 FASTQ（可选）
+        output_read1: 清洗后的 R1 输出
+        output_read2: 清洗后的 R2 输出
+        html_report: HTML 报告路径
+        json_report: JSON 报告路径
+        threads: 线程数
+        extra_args: 额外参数（列表）
+
+    Returns:
+        subprocess.CompletedProcess对象
+    """
+    check_file_exists(input_read1)
+    if input_read2:
+        check_file_exists(input_read2)
+
+    cmd = ["fastp", "-w", str(threads), "-i", str(input_read1)]
+
+    if input_read2:
+        cmd.extend(["-I", str(input_read2)])
+
+    if output_read1:
+        ensure_dir(Path(output_read1).parent)
+        cmd.extend(["-o", str(output_read1)])
+
+    if output_read2:
+        ensure_dir(Path(output_read2).parent)
+        cmd.extend(["-O", str(output_read2)])
+
+    if html_report:
+        ensure_dir(Path(html_report).parent)
+        cmd.extend(["-h", str(html_report)])
+
+    if json_report:
+        ensure_dir(Path(json_report).parent)
+        cmd.extend(["-j", str(json_report)])
+
+    if extra_args:
+        cmd.extend(extra_args)
+
+    return run_command(cmd, capture_output=False)
+
+
 def run_fastqc(input_files, output_dir, threads=4, extra_args=None):
     """
     运行FastQC进行质量控制

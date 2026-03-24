@@ -2,6 +2,14 @@
 
 本项目演示了一个完整的、由 AI 驱动的生物信息学分析流程，从原始测序数据处理到深度学习辅助的功能预测。
 
+## 项目形态
+
+这是一个 **专项项目**。
+
+- 它保留面向埃博拉 RNA-seq / Evo2 的定制研究流程
+- 它不强制并入通用模板 shared runtime
+- 当前只补齐最小统一入口：`validate_project.py` 与 `pipeline.py --validate/--steps`
+
 ## 📊 项目概览
 
 - **样本**: SRR1972739 (Zaire ebolavirus, RNA-seq)
@@ -48,6 +56,14 @@ test_rnaseq_analysis/
    - 证明了 AI 模型准确"重现"了生物学知识。
 
 ## 🚀 复现指南
+
+### 项目级自检与步骤查看
+```bash
+cd scripts
+python validate_project.py
+python pipeline.py --validate
+python pipeline.py --steps
+```
 
 ### 环境准备
 项目依赖 Docker 环境运行深度学习模型。请确保安装了 Docker 和 NVIDIA Container Toolkit。

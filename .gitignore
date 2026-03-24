@@ -46,6 +46,8 @@ build/
 *.tmp
 *.log
 .DS_Store
+projects/*/logs/validation_report.json
+projects/*/logs/validation_report.md
 
 # 大文件
 *.tar
@@ -86,4 +88,3 @@ _legacy_workspace_v1/
 *.faa
 *.gff
 *.gtf
-

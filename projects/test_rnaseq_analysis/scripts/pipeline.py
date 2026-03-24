@@ -7,16 +7,23 @@ import sys
 import argparse
 import subprocess
 import os
+import importlib.util
 from pathlib import Path
 
-# 确保 Conda 环境的 bin 目录在 PATH 中
-CONDA_BIN = "/home/vimalinx/miniforge3/envs/bio/bin"
-os.environ["PATH"] = f"{CONDA_BIN}:{os.environ.get('PATH', '')}"
-
-# 添加项目根目录到路径以便导入 config
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = SCRIPT_DIR.parent
-sys.path.insert(0, str(PROJECT_DIR))
+REPO_ROOT = PROJECT_DIR.parents[1]
+for path in (REPO_ROOT, SCRIPT_DIR):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
+
+try:
+    from lib.workspace_env import ensure_workspace_path
+except ModuleNotFoundError:
+    ensure_workspace_path = None
+
+if ensure_workspace_path is not None:
+    ensure_workspace_path()
 
 # 导入配置，但后续会重新定义为 Path 对象以避免类型混淆
 try:
@@ -38,6 +45,7 @@ ALIGN_DIR = PROCESSED_DIR / "aligned"
 # 确保子目录存在
 QC_DIR.mkdir(parents=True, exist_ok=True)
 ALIGN_DIR.mkdir(parents=True, exist_ok=True)
+VALIDATOR_PATH = SCRIPT_DIR / "validate_project.py"
 
 def run_cmd(cmd, step_name):
     print(f"[{step_name}] 🚀 Executing: {cmd}")
@@ -154,9 +162,32 @@ def step_04_results():
     print(f"\n✅ 分析完成! 报告位置: {RESULTS_DIR}/multiqc_report/multiqc_report.html")
     return True
 
+
+def run_validation() -> int:
+    spec = importlib.util.spec_from_file_location("special_project_validation", VALIDATOR_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"无法加载验证脚本: {VALIDATOR_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.run_validation()
+
+
+def print_steps() -> None:
+    steps = [
+        ("data_preparation", step_01_data_preparation.__doc__),
+        ("quality_control", step_02_quality_control.__doc__),
+        ("main_analysis", step_03_main_analysis.__doc__),
+        ("results", step_04_results.__doc__),
+    ]
+    print("可用步骤:")
+    for name, doc in steps:
+        print(f"  {name}: {doc}")
+
 def main():
     parser = argparse.ArgumentParser(description='Ebola Virus Analysis Pipeline')
     parser.add_argument('--step', help='Start from specific step')
+    parser.add_argument('--steps', action='store_true', help='List available steps only')
+    parser.add_argument('--validate', action='store_true', help='Run project validation and exit')
     args = parser.parse_args()
 
     steps = [
@@ -165,6 +196,15 @@ def main():
         ('main_analysis', step_03_main_analysis),
         ('results', step_04_results),
     ]
+
+    if args.steps:
+        print_steps()
+        return
+
+    if args.validate:
+        exit_code = run_validation()
+        print(f"项目验证完成，请查看: {PROJECT_DIR / 'logs' / 'validation_report.json'}")
+        sys.exit(exit_code)
 
     start_idx = 0
     if args.step:

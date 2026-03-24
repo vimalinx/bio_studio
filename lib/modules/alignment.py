@@ -63,12 +63,12 @@ def align_bwa_mem(
 
     if output_sam:
         ensure_dir(Path(output_sam).parent)
-        result = run_command(cmd, capture_output=False)
-        with open(output_sam, "w") as f:
-            f.write(result.stdout)
+        result = run_command(cmd)
+        with open(output_sam, "w", encoding="utf-8") as f:
+            f.write(result.stdout or "")
         return result
 
-    return run_command(cmd)
+    return run_command(cmd, capture_output=False)
 
 
 def build_bowtie2_index(reference, index_name=None):

@@ -1,5 +1,13 @@
 # 酵母菌基因组学习项目
 
+## 项目形态
+
+这是一个 **学习项目**。
+
+- 主入口是分阶段 Bash 教学脚本，而不是统一分析模板 pipeline
+- 它不强制并入通用模板 shared runtime
+- 当前只补齐最小统一入口：`validate_project.py` 与 `pipeline.py --validate/--steps`
+
 ## 📚 项目概述
 从酿酒酵母 (*Saccharomyces cerevisiae*) 开始学习基因组数据库分析。
 
@@ -34,6 +42,12 @@ bash 02_verify_install.sh
 ### 3. 运行示例分析
 ```bash
 bash 03_extract_gene.sh ACT1
+```
+
+### 4. 统一入口
+```bash
+python pipeline.py --validate
+python pipeline.py --steps
 ```
 
 ## 📊 酵母菌基因组信息

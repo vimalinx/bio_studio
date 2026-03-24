@@ -11,6 +11,7 @@ import math
 import random
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import TypedDict
 
@@ -28,6 +29,41 @@ def load_config_module():
 
 
 cfg = load_config_module()
+VALIDATOR_PATH = Path(__file__).with_name("validate_project.py")
+
+
+def load_workspace_env():
+    script_dir = Path(__file__).resolve().parent
+    for candidate_root in script_dir.parents:
+        env_path = candidate_root / "lib" / "workspace_env.py"
+        if not env_path.exists():
+            continue
+        spec = importlib.util.spec_from_file_location("bio_workspace_env", env_path)
+        if spec is None or spec.loader is None:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    return None
+
+
+def load_template_runtime():
+    script_dir = Path(__file__).resolve().parent
+    for candidate_root in script_dir.parents:
+        runtime_path = candidate_root / "lib" / "template_runtime.py"
+        if not runtime_path.exists():
+            continue
+        spec = importlib.util.spec_from_file_location("bio_template_runtime", runtime_path)
+        if spec is None or spec.loader is None:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    return None
+
+
+WORKSPACE_ENV = load_workspace_env()
+TEMPLATE_RUNTIME = load_template_runtime()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -52,6 +88,8 @@ class RNAFoldResult(TypedDict):
 
 
 def require_tools(tool_names: list[str]) -> None:
+    if WORKSPACE_ENV is not None:
+        WORKSPACE_ENV.ensure_workspace_path()
     missing = [t for t in tool_names if shutil.which(t) is None]
     if missing:
         raise RuntimeError(f"Missing required tools on PATH: {', '.join(missing)}")
@@ -300,8 +338,47 @@ def rnafold_mfe(rna_seq: str) -> dict[str, float | str | None]:
     return {"structure": structure, "mfe": mfe}
 
 
+def run_shared_ai_design_analysis(
+    dna_fa: Path,
+    dna_records: list[FastaRecord],
+) -> dict[str, object] | None:
+    if TEMPLATE_RUNTIME is None:
+        return None
+    rna_sequences = [
+        (rec.id, rec.seq.replace("T", "U"))
+        for rec in dna_records[: min(3, len(dna_records))]
+    ]
+    return TEMPLATE_RUNTIME.run_ai_design_playground_analysis(
+        cfg,
+        dna_fa,
+        rna_sequences,
+    )
+
+
+def run_validation() -> int:
+    spec = importlib.util.spec_from_file_location("project_validation", VALIDATOR_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"无法加载验证脚本: {VALIDATOR_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.run_validation()
+
+
+def print_steps() -> None:
+    print("可用步骤:")
+    print("  generate_toy_sequences: 生成 toy DNA 并写入 data/raw/toy_dna.fa")
+    print("  run_local_analysis: 运行 seqkit / prodigal / RNAfold 等本地分析")
+    print("  write_reports: 输出 report.json 和 report.md")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="In-silico toy sequence pipeline")
+    parser.add_argument(
+        "--steps", action="store_true", help="只列出可用步骤，不执行"
+    )
+    parser.add_argument(
+        "--validate", action="store_true", help="运行项目级自检并退出"
+    )
     _ = parser.add_argument(
         "--n", type=int, default=cfg.N_SEQUENCES, help="Number of toy DNA sequences"
     )
@@ -331,12 +408,21 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if args.steps:
+        print_steps()
+        return
+
+    if args.validate:
+        exit_code = run_validation()
+        report_path = Path(cfg.LOGS_DIR) / "validation_report.json"
+        print(f"项目验证完成，请查看: {report_path}")
+        sys.exit(exit_code)
+
     require_tools(["seqkit", "prodigal", "RNAfold"])
 
-    project_root = Path(__file__).resolve().parent.parent
-    raw_dir = project_root / cfg.RAW_DIR
-    processed_dir = project_root / cfg.PROCESSED_DIR
-    results_dir = project_root / cfg.RESULTS_DIR
+    raw_dir = Path(cfg.RAW_DIR)
+    processed_dir = Path(cfg.PROCESSED_DIR)
+    results_dir = Path(cfg.RESULTS_DIR)
     for d in (raw_dir, processed_dir, results_dir):
         d.mkdir(parents=True, exist_ok=True)
 
@@ -347,9 +433,33 @@ def main() -> None:
 
     dna_records = generate_toy_records(args.n, args.length, args.gc, args.seed)
     write_fasta(dna_records, dna_fa)
-    run_seqkit_stats(dna_fa, seqkit_txt)
+    shared_analysis = run_shared_ai_design_analysis(dna_fa, dna_records)
+    if shared_analysis is None:
+        run_seqkit_stats(dna_fa, seqkit_txt)
+        prodigal_out = run_prodigal(dna_fa, processed_dir, cfg.PRODIGAL_MODE)
+        rnafold_results: list[RNAFoldResult] = []
+        for rec in dna_records[: min(3, len(dna_records))]:
+            rna = rec.seq.replace("T", "U")
+            fold = rnafold_mfe(rna)
+            structure = fold.get("structure")
+            if not isinstance(structure, str):
+                structure = None
+            mfe = fold.get("mfe")
+            if not isinstance(mfe, float):
+                mfe = None
+            rnafold_results.append(
+                {
+                    "id": rec.id,
+                    "length_nt": len(rna),
+                    "structure": structure,
+                    "mfe": mfe,
+                }
+            )
+    else:
+        seqkit_txt = Path(shared_analysis["seqkit_stats"])
+        prodigal_out = shared_analysis["prodigal"]
+        rnafold_results = shared_analysis["rnafold"]
 
-    prodigal_out = run_prodigal(dna_fa, processed_dir, cfg.PRODIGAL_MODE)
     proteins_faa = Path(prodigal_out["proteins"])
     top_proteins = pick_top_proteins(proteins_faa, args.top_proteins)
 
@@ -369,25 +479,6 @@ def main() -> None:
     esm_scores: dict[str, dict[str, float | None]] = {}
     if args.use_esm_contacts and top_proteins:
         esm_scores = esm_contacts_score(top_proteins, args.esm_model)
-
-    rnafold_results: list[RNAFoldResult] = []
-    for rec in dna_records[: min(3, len(dna_records))]:
-        rna = rec.seq.replace("T", "U")
-        fold = rnafold_mfe(rna)
-        structure = fold.get("structure")
-        if not isinstance(structure, str):
-            structure = None
-        mfe = fold.get("mfe")
-        if not isinstance(mfe, float):
-            mfe = None
-        rnafold_results.append(
-            {
-                "id": rec.id,
-                "length_nt": len(rna),
-                "structure": structure,
-                "mfe": mfe,
-            }
-        )
 
     gc_values = [gc_frac(r.seq) for r in dna_records]
     mean_gc = sum(gc_values) / len(gc_values)

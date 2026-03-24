@@ -2,24 +2,23 @@
 test_env_validation 项目配置
 """
 
-# 项目配置
+from pathlib import Path
+
 PROJECT_NAME = "test_env_validation"
 PROJECT_TYPE = "rnaseq"
+PROJECT_DESCRIPTION = "Environment validation test project"
 
-# 数据路径
-DATA_DIR = "data"
-RAW_DIR = f"{DATA_DIR}/raw"
-PROCESSED_DIR = f"{DATA_DIR}/processed"
-RESULTS_DIR = f"{DATA_DIR}/results"
-REFERENCES_DIR = f"{DATA_DIR}/references"
+SCRIPTS_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DIR = DATA_DIR / "raw"
+PROCESSED_DIR = DATA_DIR / "processed"
+RESULTS_DIR = DATA_DIR / "results"
+REFERENCES_DIR = DATA_DIR / "references"
+LOGS_DIR = PROJECT_ROOT / "logs"
+NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 
-# 样本配置
 SAMPLES = []
-
-# 参考基因组
 REFERENCE_GENOME = None
-
-# 工具配置
 THREADS = 4
-
-# 分析参数
+ANALYSIS_PARAMETERS = {}
