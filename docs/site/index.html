@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bio Studio | AI 生物计算工作台</title>
+  <meta
+    name="description"
+    content="Bio Studio 是一个为 AI agent 组织的生物计算工作台：协议、技能、MCP 服务、隔离项目、共享数据和重型外部引擎共同组成一套可执行研究环境。"
+  >
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --bg-strong: #ece4d6;
+      --surface: #fbf8f3;
+      --surface-2: #f6f1e8;
+      --ink: #181411;
+      --muted: #655c54;
+      --line: rgba(24, 20, 17, 0.14);
+      --line-strong: rgba(24, 20, 17, 0.24);
+      --accent: #9c3d24;
+      --accent-soft: rgba(156, 61, 36, 0.12);
+      --teal: #1d5b63;
+      --teal-soft: rgba(29, 91, 99, 0.12);
+      --olive: #556247;
+      --olive-soft: rgba(85, 98, 71, 0.12);
+      --gold: #ad7a1f;
+      --gold-soft: rgba(173, 122, 31, 0.14);
+      --shadow: 0 16px 40px rgba(41, 30, 22, 0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --content: 1380px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(29, 91, 99, 0.12), transparent 28%),
+        radial-gradient(circle at left center, rgba(156, 61, 36, 0.10), transparent 24%),
+        linear-gradient(var(--bg), var(--bg));
+      font-family: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(24, 20, 17, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 20, 17, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 92%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(calc(100% - 32px), var(--content));
+      margin: 0 auto;
+      padding: 20px 0 72px;
+      position: relative;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 10px 0 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(244, 239, 230, 0.86);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: var(--bg);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .brand-copy span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topnav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .topnav a {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .topnav a:hover,
+    .topnav a.active {
+      color: var(--ink);
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+
+    .panel {
+      background: rgba(251, 248, 243, 0.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 30px 30px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -64px;
+      top: -64px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(29, 91, 99, 0.17), transparent 72%);
+      pointer-events: none;
+    }
+
+    .eyeline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .token {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .token strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(34px, 4vw, 64px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      max-width: 11ch;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 65ch;
+      color: #403932;
+      font-size: 17px;
+    }
+
+    .hero-note {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .hero-note div {
+      min-width: 0;
+    }
+
+    .hero-note strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .hero-note span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .overview {
+      padding: 22px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 16px;
+    }
+
+    .overview h2,
+    .section-header h2,
+    .subsection h3,
+    .table-card h3,
+    .callout h3 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .overview p,
+    .section-header p,
+    .subsection p,
+    .callout p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .signal {
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .signal strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+    }
+
+    .signal span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .legend b {
+      font-weight: 600;
+    }
+
+    .legend span {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .section {
+      margin-top: 26px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-header .copy {
+      max-width: 760px;
+    }
+
+    .section-header .kicker {
+      color: var(--muted);
+      font-size: 12px;
+      padding-bottom: 4px;
+    }
+
+    .layer-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 100px 1fr 320px;
+      gap: 18px;
+      padding: 18px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(251, 248, 243, 0.72);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .layer.visible,
+    .panel.visible,
+    .subsection.visible,
+    .table-card.visible,
+    .callout.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .layer-index {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .layer-index strong {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .layer-index span {
+      font-size: 40px;
+      letter-spacing: -0.05em;
+      line-height: 0.9;
+    }
+
+    .layer-copy h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .layer-copy p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .layer-meta {
+      display: grid;
+      gap: 10px;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+    }
+
+    .meta-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .meta-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .meta-box span,
+    .meta-box ul {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .flow-layout {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .subsection,
+    .table-card,
+    .callout {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(251, 248, 243, 0.75);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .svg-frame {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.4));
+      padding: 12px;
+      margin-top: 14px;
+    }
+
+    svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .path-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .path-list div {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .path-list div:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .path-list code,
+    .command,
+    .inline-code {
+      font-family: "IBM Plex Mono", "JetBrains Mono", "SFMono-Regular", "Consolas", monospace;
+      font-size: 12.5px;
+    }
+
+    .path-list code {
+      color: var(--accent);
+      font-weight: 600;
+      background: var(--accent-soft);
+      padding: 3px 6px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .bar {
+      display: grid;
+      gap: 6px;
+    }
+
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .track {
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(24, 20, 17, 0.08);
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--ink), var(--accent));
+    }
+
+    .fill.teal {
+      background: linear-gradient(90deg, var(--teal), #2d7982);
+    }
+
+    .fill.olive {
+      background: linear-gradient(90deg, var(--olive), #728362);
+    }
+
+    .fill.gold {
+      background: linear-gradient(90deg, var(--gold), #cb9937);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.52);
+      display: grid;
+      gap: 10px;
+    }
+
+    .project-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .project-card h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.025em;
+    }
+
+    .size-pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      white-space: nowrap;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .project-card p,
+    .project-card li,
+    .matrix td,
+    .matrix th,
+    .debt-card li {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .project-card ul,
+    .debt-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .matrix {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+    }
+
+    .matrix th,
+    .matrix td {
+      text-align: left;
+      padding: 12px 10px;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .matrix th {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+      width: fit-content;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--olive);
+    }
+
+    .status.warn::before {
+      background: var(--gold);
+    }
+
+    .status.risk::before {
+      background: var(--accent);
+    }
+
+    .debt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .debt-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .debt-card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .quickstart {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 16px;
+    }
+
+    .command-block {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      background: #1c1815;
+      color: #ede6db;
+      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .command-block code {
+      white-space: pre;
+      display: block;
+      font-family: "IBM Plex Mono", "JetBrains Mono", "SFMono-Regular", "Consolas", monospace;
+      font-size: 12.5px;
+      line-height: 1.72;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer strong {
+      color: var(--ink);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1180px) {
+      .masthead,
+      .flow-layout,
+      .quickstart,
+      .grid-3,
+      .debt-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .layer {
+        grid-template-columns: 80px 1fr;
+      }
+
+      .layer-meta {
+        grid-column: 1 / -1;
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+
+      .hero-note {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .shell {
+        width: min(calc(100% - 20px), var(--content));
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .topnav {
+        justify-content: flex-start;
+      }
+
+      .path-list div {
+        grid-template-columns: 1fr;
+      }
+
+      .signal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .hero,
+      .overview,
+      .subsection,
+      .table-card,
+      .callout,
+      .layer {
+        padding: 16px;
+      }
+
+      .signal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">BS</div>
+        <div class="brand-copy">
+          <strong>Bio Studio / AI 生物计算工作台</strong>
+          <span>/home/vimalinx/Projects/bio_studio</span>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Page sections">
+        <a href="#overview">总览</a>
+        <a href="#layers">六层结构</a>
+        <a href="#flow">AI 回路</a>
+        <a href="#projects">项目样本</a>
+        <a href="#matrix">能力矩阵</a>
+        <a href="#state">现状</a>
+        <a href="#entry">入口</a>
+      </nav>
+    </header>
+
+    <section class="masthead reveal" id="overview">
+      <article class="hero panel">
+        <div class="eyeline">
+          <div class="token"><strong>定位</strong> AI-first bio compute workspace</div>
+          <div class="token"><strong>范式</strong> protocol + skills + projects + engines</div>
+          <div class="token"><strong>快照</strong> 2026-03-23 local scan</div>
+        </div>
+        <h1>这不是一个普通生信仓库。</h1>
+        <p>
+          Bio Studio 更像一套专门给 AI agent 使用的生物计算工作台。它把操作协议、Claude
+          skills、MCP servers、隔离项目目录、共享参考数据，以及 Evo2 / RFdiffusion /
+          Biomni 这类重型外部引擎，压进同一个可执行研究环境里。人类读 README，AI 读协议后直接干活。
+        </p>
+        <div class="hero-note">
+          <div>
+            <strong>它真正卖的不是某一个模型</strong>
+            <span>而是把“环境、流程、工具、任务现场”收束为一个 AI 可操作的研究面板。</span>
+          </div>
+          <div>
+            <strong>核心资产不只是代码</strong>
+            <span>还包括样例项目、文档规约、经验记录、共享参考和挂载的外部能力。</span>
+          </div>
+          <div>
+            <strong>正确理解方式</strong>
+            <span>把它当作“AI 研究操作系统”，而不是单一应用或整洁的 SDK 仓库。</span>
+          </div>
+        </div>
+      </article>
+
+      <aside class="overview panel">
+        <div>
+          <h2>现场信号</h2>
+          <p>来自当前仓库扫描的几个关键数值。</p>
+        </div>
+        <div class="signal-grid">
+          <div class="signal">
+            <strong>6</strong>
+            <span>隔离项目目录</span>
+          </div>
+          <div class="signal">
+            <strong>9</strong>
+            <span>本地 Claude skills</span>
+          </div>
+          <div class="signal">
+            <strong>3 / 5</strong>
+            <span>已落地 / 预留 MCP servers</span>
+          </div>
+          <div class="signal">
+            <strong>4</strong>
+            <span>active 外部引擎仓库</span>
+          </div>
+        </div>
+        <div class="legend">
+          <div><b>5.9G</b><span>vendored 外部能力：RFdiffusion、Evo2、Biomni、LiteFold</span></div>
+          <div><b>2.9G</b><span>项目工作区：案例、结果、分析产物和中间文件</span></div>
+          <div><b>2</b><span>当前外部仓库处于 dirty 状态：RFdiffusion、litefold/source</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">一句话定性</div>
+          <h2>Bio Studio 的核心价值，在于把 AI 需要的上下文预先编排好了。</h2>
+          <p>
+            你不需要从零教 agent 目录规范、工具入口、项目隔离方式、环境验证规则或常见坑。
+            这些东西已经被写进文档、脚本、skills 和样例项目里，形成了一层可复用的操作语境。
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="callout reveal">
+          <h3>它不是什么</h3>
+          <p>不是纯应用，不是纯算法仓库，也不是单一模型的外壳。</p>
+          <div class="path-list">
+            <div>
+              <code>不是一个整洁 SDK</code>
+              <span>自研代码相对薄，更多是 wrapper、协议、模板和 orchestration glue。</span>
+            </div>
+            <div>
+              <code>不是只给人看的文档库</code>
+              <span>很多内容明显是给 agent 当工作约束和执行上下文用的。</span>
+            </div>
+            <div>
+              <code>不是单一科研项目</code>
+              <span>仓库里同时存在环境维护、教学案例、RNA-seq 分析、设计实验和第三方引擎集成。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="callout reveal">
+          <h3>它更接近什么</h3>
+          <p>更像一个 AI 生物计算 studio runtime。</p>
+          <div class="path-list">
+            <div>
+              <code>protocol layer</code>
+              <span>告诉 agent 在部署工具和跑分析时必须遵守的动作顺序。</span>
+            </div>
+            <div>
+              <code>workspace layer</code>
+              <span>把真实任务放进项目隔离目录，避免环境和产物相互污染。</span>
+            </div>
+            <div>
+              <code>engine layer</code>
+              <span>通过 vendored repos 和 MCP，让 AI 直接碰到外部模型与数据库。</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="layers">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">仓库地图</div>
+          <h2>六层结构，决定了这个仓库为什么看起来不像“标准项目”。</h2>
+          <p>
+            如果把所有目录平铺看，它会显得很散。把它拆成六层后，角色就清晰了：
+            规则、骨架、接口、任务现场、外挂引擎、共享与遗留。
+          </p>
+        </div>
+      </div>
+
+      <div class="layer-stack">
+        <article class="layer reveal">
+          <div class="layer-index">
+            <strong>Layer 01</strong>
+            <span>01</span>
+          </div>
+          <div class="layer-copy">
+            <h3>操作手册层</h3>
+            <p>
+              这层定义 AI 在仓库中如何行动：先读什么、何时验证环境、何时更新日志、如何避免破坏现有工作区。
+              它是 agent 的行为约束层，也是 Bio Studio 的真正中控台。
+            </p>
+            <div class="chip-row">
+              <span class="chip">README.md</span>
+              <span class="chip">CLAUDE.md</span>
+              <span class="chip">docs/AI_ANALYSIS_PROTOCOL.md</span>
+              <span class="chip">docs/AI_TOOL_PROTOCOL.md</span>
+              <span class="chip">docs/BEST_PRACTICES.md</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>作用</strong>
+              <span>把“怎么工作”写死，避免 agent 每次从零猜测流程。</span>
+            </div>
+            <div class="meta-box">
+              <strong>关键词</strong>
+              <span>project isolation / validation first / changelog / rollback</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer reveal">
+          <div class="layer-index">
+            <strong>Layer 02</strong>
+            <span>02</span>
+          </div>
+          <div class="layer-copy">
+            <h3>自研骨架层</h3>
+            <p>
+              这里是 Bio Studio 自己写的脚手架：项目模板生成器、环境快照脚本、CLI wrappers，以及一些
+              design / analysis glue code。它不是厚框架，但足以把本地工具和项目规范捏成一套骨架。
+            </p>
+            <div class="chip-row">
+              <span class="chip">lib/</span>
+              <span class="chip">scripts/maintenance/</span>
+              <span class="chip">tools/scripts/</span>
+              <span class="chip">setup_env.sh</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>代表入口</strong>
+              <span>lib/create_project.py, scripts/maintenance/generate_env_report.py</span>
+            </div>
+            <div class="meta-box">
+              <strong>本质</strong>
+              <span>orchestration glue，而不是大型研究框架。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer reveal">
+          <div class="layer-index">
+            <strong>Layer 03</strong>
+            <span>03</span>
+          </div>
+          <div class="layer-copy">
+            <h3>AI 接口层</h3>
+            <p>
+              `.claude/skills/` 和 `mcp-servers/` 组成了 agent 的直接操作面。
+              一部分能力通过技能文档调度，一部分通过 MCP 把序列分析、结构分析和数据库查询暴露成工具。
+            </p>
+            <div class="chip-row">
+              <span class="chip">.claude/skills/</span>
+              <span class="chip">.claude/agents/</span>
+              <span class="chip">mcp-servers/bio-sequence-mcp</span>
+              <span class="chip">mcp-servers/bio-structure-mcp</span>
+              <span class="chip">mcp-servers/bio-database-mcp</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>已落地</strong>
+              <span>3 个 live MCP servers, 9 个 Claude skills</span>
+            </div>
+            <div class="meta-box">
+              <strong>预留位</strong>
+              <span>bio-design-mcp, bio-lab-mcp 仍是空壳</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer reveal">
+          <div class="layer-index">
+            <strong>Layer 04</strong>
+            <span>04</span>
+          </div>
+          <div class="layer-copy">
+            <h3>任务现场层</h3>
+            <p>
+              `projects/` 才是 agent 实际工作的地方。每个项目都有自己独立的数据、脚本、日志和结果。
+              环境验证、RNA-seq 分析、toy design playground、酵母学习项目都放在这里。
+            </p>
+            <div class="chip-row">
+              <span class="chip">projects/test_env_validation</span>
+              <span class="chip">projects/ai_design_playground</span>
+              <span class="chip">projects/test_rnaseq_analysis</span>
+              <span class="chip">projects/yeast_rnaseq_demo</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>当前规模</strong>
+              <span>6 个项目目录，总计约 2.9G</span>
+            </div>
+            <div class="meta-box">
+              <strong>这里最像“工作成果”</strong>
+              <span>真实报告、结果文件、脚本和案例都在这一层。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer reveal">
+          <div class="layer-index">
+            <strong>Layer 05</strong>
+            <span>05</span>
+          </div>
+          <div class="layer-copy">
+            <h3>外挂引擎层</h3>
+            <p>
+              真正重型的能力不是自研的，而是 vendored 进来的外部仓库：RFdiffusion、Evo2、Biomni、
+              LiteFold。Bio Studio 把它们组织进同一工作区里，让 AI 能够调度这些引擎。
+            </p>
+            <div class="chip-row">
+              <span class="chip">repositories/active/RFdiffusion</span>
+              <span class="chip">repositories/active/evo2</span>
+              <span class="chip">repositories/active/Biomni</span>
+              <span class="chip">repositories/active/litefold</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>当前规模</strong>
+              <span>约 5.9G，其中 RFdiffusion 3.3G，evo2 2.6G</span>
+            </div>
+            <div class="meta-box">
+              <strong>结论</strong>
+              <span>仓库的“能力”很多来自外部发动机，Bio Studio 做的是编排和使用语境。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer reveal">
+          <div class="layer-index">
+            <strong>Layer 06</strong>
+            <span>06</span>
+          </div>
+          <div class="layer-copy">
+            <h3>共享与遗留层</h3>
+            <p>
+              `shared_data/` 提供跨项目共享参考，`_legacy_workspace_v1/` 保存旧架构痕迹，`tmp/` 和
+              `evo2-7b-hf/` 则反映了尚未收口的工作面。这层决定了仓库的历史包袱和运维边缘地带。
+            </p>
+            <div class="chip-row">
+              <span class="chip">shared_data/</span>
+              <span class="chip">_legacy_workspace_v1/</span>
+              <span class="chip">tmp/</span>
+              <span class="chip">evo2-7b-hf/</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>共享数据</strong>
+              <span>参考序列、数据库、工具索引</span>
+            </div>
+            <div class="meta-box">
+              <strong>遗留信号</strong>
+              <span>旧工作区和空目录显示出仓库仍处于持续整形中。</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="flow">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">执行回路</div>
+          <h2>AI 在这里不是“帮你看代码”，而是被设计成能沿着完整研究回路走。</h2>
+          <p>
+            这个仓库的关键，不在于某个单独脚本，而在于 agent 可以从请求开始，一路穿过协议、技能、
+            MCP、项目工作区和报告输出，最后把产物落回可追踪的目录。
+          </p>
+        </div>
+      </div>
+
+      <div class="flow-layout">
+        <article class="subsection reveal">
+          <h3>Bio Studio 的 AI work loop</h3>
+          <p>下面这条链路，解释了为什么它是工作台，而不是普通资料仓。</p>
+          <div class="svg-frame">
+            <svg viewBox="0 0 760 410" role="img" aria-label="AI work loop diagram">
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                  <path d="M0,0 L10,5 L0,10 Z" fill="#181411"></path>
+                </marker>
+              </defs>
+              <rect x="24" y="22" width="154" height="68" rx="12" fill="#fbf8f3" stroke="rgba(24,20,17,0.18)"></rect>
+              <text x="42" y="51" font-size="17" font-weight="700" fill="#181411">用户任务</text>
+              <text x="42" y="74" font-size="12" fill="#655c54">自然语言研究请求</text>
+
+              <rect x="228" y="22" width="154" height="68" rx="12" fill="#f6eee7" stroke="rgba(156,61,36,0.28)"></rect>
+              <text x="246" y="51" font-size="17" font-weight="700" fill="#181411">协议与规则</text>
+              <text x="246" y="74" font-size="12" fill="#655c54">CLAUDE.md / docs protocols</text>
+
+              <rect x="432" y="22" width="154" height="68" rx="12" fill="#eef3f3" stroke="rgba(29,91,99,0.28)"></rect>
+              <text x="450" y="51" font-size="17" font-weight="700" fill="#181411">skills / MCP</text>
+              <text x="450" y="74" font-size="12" fill="#655c54">可调用能力界面</text>
+
+              <rect x="636" y="22" width="100" height="68" rx="12" fill="#f2f1e7" stroke="rgba(85,98,71,0.28)"></rect>
+              <text x="654" y="51" font-size="17" font-weight="700" fill="#181411">引擎</text>
+              <text x="654" y="74" font-size="12" fill="#655c54">Evo2 等</text>
+
+              <rect x="126" y="172" width="204" height="84" rx="12" fill="#fbf8f3" stroke="rgba(24,20,17,0.18)"></rect>
+              <text x="144" y="202" font-size="18" font-weight="700" fill="#181411">projects/&lt;name&gt;</text>
+              <text x="144" y="224" font-size="12" fill="#655c54">data / scripts / logs / reports</text>
+              <text x="144" y="243" font-size="12" fill="#655c54">AI 的实际工作现场</text>
+
+              <rect x="402" y="172" width="210" height="84" rx="12" fill="#fbf8f3" stroke="rgba(24,20,17,0.18)"></rect>
+              <text x="420" y="202" font-size="18" font-weight="700" fill="#181411">shared_data + lib</text>
+              <text x="420" y="224" font-size="12" fill="#655c54">共享参考与薄封装工具层</text>
+              <text x="420" y="243" font-size="12" fill="#655c54">减少每个项目重复搭建</text>
+
+              <rect x="216" y="322" width="320" height="64" rx="12" fill="#fbf8f3" stroke="rgba(24,20,17,0.18)"></rect>
+              <text x="236" y="350" font-size="18" font-weight="700" fill="#181411">结果、报告、变更记录、经验归档</text>
+              <text x="236" y="371" font-size="12" fill="#655c54">results / ANALYSIS_REPORT / CHANGELOG / BEST_PRACTICES</text>
+
+              <line x1="178" y1="56" x2="228" y2="56" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+              <line x1="382" y1="56" x2="432" y2="56" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+              <line x1="586" y1="56" x2="636" y2="56" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+              <line x1="304" y1="90" x2="228" y2="172" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+              <line x1="508" y1="90" x2="508" y2="172" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+              <line x1="330" y1="214" x2="402" y2="214" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+              <line x1="376" y1="256" x2="376" y2="322" stroke="#181411" stroke-width="1.8" marker-end="url(#arrow)"></line>
+            </svg>
+          </div>
+        </article>
+
+        <article class="subsection reveal">
+          <h3>关键路径</h3>
+          <p>真正让 Bio Studio 有辨识度的，不是“工具多”，而是路径被预设过。</p>
+          <div class="path-list">
+            <div>
+              <code>1. 读协议</code>
+              <span>AI 先看操作约束，再决定如何动手，不是直接盲跑命令。</span>
+            </div>
+            <div>
+              <code>2. 选接口</code>
+              <span>能通过 skill 或 MCP 走的路径，会优先变成可重复调用的工具面。</span>
+            </div>
+            <div>
+              <code>3. 进项目</code>
+              <span>分析尽量落在 `projects/&lt;name&gt;`，而不是污染仓库根目录。</span>
+            </div>
+            <div>
+              <code>4. 产物落盘</code>
+              <span>报告、结果和日志写回项目目录或 docs，让后续 agent 有东西可继承。</span>
+            </div>
+            <div>
+              <code>5. 经验回写</code>
+              <span>踩坑会进入 `BEST_PRACTICES`，环境变更进入 `CHANGELOG` 和 `ENVIRONMENT`。</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">目录解剖</div>
+          <h2>从 agent 的视角看，真正值得频繁读写的是这些地方。</h2>
+          <p>
+            并不是每个目录地位相同。下面这张 atlas 更接近“agent 实际会怎么用它们”。
+          </p>
+        </div>
+      </div>
+
+      <article class="table-card reveal">
+        <h3>Directory atlas</h3>
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>路径</th>
+              <th>角色</th>
+              <th>AI 会在这里做什么</th>
+              <th>重要度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th><span class="inline-code">README.md / CLAUDE.md</span></th>
+              <td>总入口与行为准则</td>
+              <td>理解仓库定位、关键规则、执行协议和环境要求</td>
+              <td><span class="status">最高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">docs/</span></th>
+              <td>规范与运行记录</td>
+              <td>读取分析协议、部署协议、避坑总结、环境快照和变更日志</td>
+              <td><span class="status">最高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">projects/</span></th>
+              <td>任务工作区</td>
+              <td>运行 pipeline、写日志、产出报告、保存结果、隔离样本与脚本</td>
+              <td><span class="status">最高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">.claude/skills/</span></th>
+              <td>agent prompt surface</td>
+              <td>调用预定义技能，减少 agent 每次重新组织流程</td>
+              <td><span class="status">高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">mcp-servers/</span></th>
+              <td>工具接口层</td>
+              <td>把序列、结构和数据库能力暴露为 MCP tools</td>
+              <td><span class="status">高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">lib/</span></th>
+              <td>薄封装与项目脚手架</td>
+              <td>复用 CLI wrappers, create_project, utilities</td>
+              <td><span class="status">高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">repositories/active/</span></th>
+              <td>重型外部引擎</td>
+              <td>借用 Evo2 / RFdiffusion / Biomni / LiteFold 提供的实质计算能力</td>
+              <td><span class="status">高</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">shared_data/</span></th>
+              <td>共享参考层</td>
+              <td>读取参考序列、数据库和跨项目公共资源</td>
+              <td><span class="status">中</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">_legacy_workspace_v1/</span></th>
+              <td>旧架构遗留</td>
+              <td>通常不作为当前主工作面，但能暴露历史结构和迁移痕迹</td>
+              <td><span class="status warn">低</span></td>
+            </tr>
+            <tr>
+              <th><span class="inline-code">tmp/ / evo2-7b-hf/</span></th>
+              <td>边缘目录</td>
+              <td>当前几乎没有有效内容，更像保留位或未收口工作面</td>
+              <td><span class="status warn">低</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">项目样本</div>
+          <h2>这里最有价值的，不只是工具列表，而是“已经被走过一次的工作流”。</h2>
+          <p>
+            项目目录展示了这套工作台如何被实际使用：从环境验收到 toy 设计，到真实 RNA-seq 案例和论文风格输出。
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="subsection reveal">
+          <h3>项目体量分布</h3>
+          <p>这个分布本身就说明仓库里装的是“工作现场”，不只是模板。</p>
+          <div class="bars">
+            <div class="bar">
+              <div class="bar-head"><strong>test_rnaseq_analysis</strong><span>2.3G</span></div>
+              <div class="track"><div class="fill" style="width: 100%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>yeast_rnaseq_demo</strong><span>547M</span></div>
+              <div class="track"><div class="fill teal" style="width: 24%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>yeast_genome_learning</strong><span>42M</span></div>
+              <div class="track"><div class="fill olive" style="width: 1.8%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>test_env_validation</strong><span>15M</span></div>
+              <div class="track"><div class="fill gold" style="width: 0.7%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>ai_design_playground</strong><span>64K</span></div>
+              <div class="track"><div class="fill teal" style="width: 0.02%"></div></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="subsection reveal">
+          <h3>这些项目各自扮演什么角色</h3>
+          <p>它们不是重复，而是分别承担环境、教学、案例、设计和展示任务。</p>
+          <div class="grid-2" style="margin-top: 16px;">
+            <div class="project-card">
+              <header>
+                <h3>test_env_validation</h3>
+                <span class="size-pill">15M</span>
+              </header>
+              <p>环境验收项目。用 mock 数据快速验证 Fastp / STAR / featureCounts / MultiQC / Python libs 链路。</p>
+            </div>
+            <div class="project-card">
+              <header>
+                <h3>ai_design_playground</h3>
+                <span class="size-pill">64K</span>
+              </header>
+              <p>toy dry-lab playground。合成 toy DNA，跑 Prodigal / RNAfold，生成可读报告。</p>
+            </div>
+            <div class="project-card">
+              <header>
+                <h3>test_rnaseq_analysis</h3>
+                <span class="size-pill">2.3G</span>
+              </header>
+              <p>Ebola RNA-seq + Evo2 增强分析，是整个仓库最像“实战 showcase”的案例。</p>
+            </div>
+            <div class="project-card">
+              <header>
+                <h3>yeast_rnaseq_demo</h3>
+                <span class="size-pill">547M</span>
+              </header>
+              <p>把分析结果写成论文样式，说明工作台想覆盖从 pipeline 到 narrative output 的整链条。</p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid-3" style="margin-top: 16px;">
+        <article class="project-card reveal">
+          <header>
+            <h3>example_rnaseq</h3>
+            <span class="size-pill">16K</span>
+          </header>
+          <p>最接近模板项目，用来作为新分析的脚手架入口。</p>
+          <ul>
+            <li>适合新建项目演示</li>
+            <li>强调目录规范而非复杂逻辑</li>
+          </ul>
+        </article>
+
+        <article class="project-card reveal">
+          <header>
+            <h3>yeast_genome_learning</h3>
+            <span class="size-pill">42M</span>
+          </header>
+          <p>教学导向项目，还额外带了 `www/index.html` 的静态展示页。</p>
+          <ul>
+            <li>适合做入门学习路径</li>
+            <li>说明仓库也承担展示与教育用途</li>
+          </ul>
+        </article>
+
+        <article class="project-card reveal">
+          <header>
+            <h3>样本层的共同点</h3>
+            <span class="size-pill">pattern</span>
+          </header>
+          <p>都有项目隔离、结果归档、独立脚本入口，符合协议里强调的 workspace hygiene。</p>
+          <ul>
+            <li>`data/raw / processed / results`</li>
+            <li>`scripts/` 作为可复现逻辑承载</li>
+            <li>报告落在项目根或 results 中</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="matrix">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">能力矩阵</div>
+          <h2>Bio Studio 的价值，不在“会不会做某个分析”，而在“能不能把不同能力接到一个 agent 工作面里”。</h2>
+          <p>
+            同一项任务，可能经过 skills、MCP、CLI wrappers、外部引擎和项目脚本多个接口。
+            这个叠层才是它的真正密度。
+          </p>
+        </div>
+      </div>
+
+      <article class="table-card reveal">
+        <h3>Capability matrix</h3>
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>能力域</th>
+              <th>本地接口</th>
+              <th>外部引擎 / 数据面</th>
+              <th>典型落点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>序列基础分析</th>
+              <td>bio-sequence-mcp, sequence-analysis skill, Biopython</td>
+              <td>本地 FASTA / DNA / RNA / protein input</td>
+              <td>快速分析、翻译、ORF、GC、反向互补</td>
+            </tr>
+            <tr>
+              <th>结构分析与预测</th>
+              <td>bio-structure-mcp, protein-structure skill, tools/scripts/protein_predict.py</td>
+              <td>ESM, LiteFold, 可能的 AlphaFold / ColabFold 路径</td>
+              <td>PDB 解析、结构预测、接触图、稳定性估计</td>
+            </tr>
+            <tr>
+              <th>文献与数据库</th>
+              <td>bio-database-mcp, Biomni tools, target_analysis.py</td>
+              <td>PubMed, NCBI, UniProt, MyGene, OpenTargets</td>
+              <td>基因信息、文献检索、BLAST、靶点评估</td>
+            </tr>
+            <tr>
+              <th>NGS / RNA-seq</th>
+              <td>rnaseq-pipeline skill, lib/modules wrappers</td>
+              <td>Fastp, FastQC, STAR, HISAT2, featureCounts, bcftools</td>
+              <td>从 mock validation 到真实 RNA-seq 案例</td>
+            </tr>
+            <tr>
+              <th>生成式设计</th>
+              <td>tools/scripts/dna_design.py, mrna_optimize.py, phage-design skill</td>
+              <td>Evo2, RFdiffusion, 自定义脚本</td>
+              <td>toy sequence design, phage concept, DNA/mRNA 优化</td>
+            </tr>
+            <tr>
+              <th>agent orchestration</th>
+              <td>CLAUDE.md, docs protocols, .claude/skills, MCP config</td>
+              <td>Claude Code / Codex session runtime</td>
+              <td>把分析从“命令集合”提升为“AI 可执行工作流”</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="section" id="state">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">现状与技术债</div>
+          <h2>它是活的工作台，不是打磨完毕的产品，因此会同时存在锋利和粗糙的地方。</h2>
+          <p>
+            这部分很重要。你如果把它当 polished product，会挑出很多结构问题；
+            但如果把它当 AI research runtime，它的很多“不整洁”恰恰来自真实工作沉淀。
+          </p>
+        </div>
+      </div>
+
+      <div class="debt-grid">
+        <article class="debt-card reveal">
+          <h3>已经成型的部分</h3>
+          <ul>
+            <li>AI-first 的操作语境很明确，协议层写得足够具体。</li>
+            <li>项目隔离理念贯彻得比较一致。</li>
+            <li>已有 3 个可工作的 MCP servers 和 9 个本地 skills。</li>
+            <li>Ebola RNA-seq / yeast demo / toy playground 提供了现实样本。</li>
+          </ul>
+        </article>
+
+        <article class="debt-card reveal">
+          <h3>明显半成品区域</h3>
+          <ul>
+            <li>`bio-design-mcp` 和 `bio-lab-mcp` 目前只是空目录。</li>
+            <li>`tmp/` 与 `evo2-7b-hf/` 没形成稳定职责。</li>
+            <li>`tools/scripts/` 成熟度不均，有些更像 exploratory scripts。</li>
+            <li>`lib/` 某些 wrapper 仍然比较脆，偏 shell glue 风格。</li>
+          </ul>
+        </article>
+
+        <article class="debt-card reveal">
+          <h3>当前仓库风险信号</h3>
+          <ul>
+            <li>外部引擎仓库当前有 2 个 dirty working tree。</li>
+            <li>`.gitmodules` 只映射了 RFdiffusion，litefold/source 仍不一致。</li>
+            <li>仓库混合了代码、数据、结果和第三方源码，治理成本高。</li>
+            <li>这是一套强依赖本地环境状态的系统，不是零配置 clone-and-run。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <article class="subsection reveal">
+          <h3>MCP 现状</h3>
+          <p>5 个槽位里，3 个已成型，2 个还在规划态。</p>
+          <div class="bars">
+            <div class="bar">
+              <div class="bar-head"><strong>bio-sequence-mcp</strong><span>live</span></div>
+              <div class="track"><div class="fill olive" style="width: 100%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>bio-structure-mcp</strong><span>live</span></div>
+              <div class="track"><div class="fill olive" style="width: 100%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>bio-database-mcp</strong><span>live</span></div>
+              <div class="track"><div class="fill olive" style="width: 100%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>bio-design-mcp</strong><span>placeholder</span></div>
+              <div class="track"><div class="fill gold" style="width: 20%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>bio-lab-mcp</strong><span>placeholder</span></div>
+              <div class="track"><div class="fill gold" style="width: 20%"></div></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="subsection reveal">
+          <h3>外部引擎体量</h3>
+          <p>真正的重计算能力主要集中在 vendored engines 这一层。</p>
+          <div class="bars">
+            <div class="bar">
+              <div class="bar-head"><strong>RFdiffusion</strong><span>3.3G</span></div>
+              <div class="track"><div class="fill" style="width: 100%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>evo2</strong><span>2.6G</span></div>
+              <div class="track"><div class="fill teal" style="width: 78.7%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>litefold</strong><span>6.9M</span></div>
+              <div class="track"><div class="fill gold" style="width: 0.2%"></div></div>
+            </div>
+            <div class="bar">
+              <div class="bar-head"><strong>Biomni</strong><span>5.0M</span></div>
+              <div class="track"><div class="fill olive" style="width: 0.15%"></div></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="entry">
+      <div class="section-header reveal">
+        <div class="copy">
+          <div class="kicker">入口与使用</div>
+          <h2>如果你要向别人介绍这个仓库，最好的方式不是口头解释，而是让他沿着这条入口路径走一遍。</h2>
+          <p>
+            先理解定位，再看协议，再看验证项目，最后再去碰真实案例和外部引擎。
+          </p>
+        </div>
+      </div>
+
+      <div class="quickstart">
+        <article class="subsection reveal">
+          <h3>推荐阅读顺序</h3>
+          <div class="path-list">
+            <div>
+              <code>1. README.md</code>
+              <span>先拿到全局定位：这是 AI 驱动的生物工作区，而不是普通代码项目。</span>
+            </div>
+            <div>
+              <code>2. CLAUDE.md</code>
+              <span>理解 agent 在这里的职责、环境规则和工作纪律。</span>
+            </div>
+            <div>
+              <code>3. docs/BEST_PRACTICES.md</code>
+              <span>看真实踩坑和已沉淀的环境经验。</span>
+            </div>
+            <div>
+              <code>4. projects/test_env_validation/</code>
+              <span>确认这套环境不是停留在纸面，而是能走通基本工具链。</span>
+            </div>
+            <div>
+              <code>5. projects/ai_design_playground/</code>
+              <span>看一条轻量的 dry-lab pipeline 是怎么写出来的。</span>
+            </div>
+            <div>
+              <code>6. projects/test_rnaseq_analysis/</code>
+              <span>最后再去看最完整的 showcase 项目和重型引擎接法。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="subsection reveal">
+          <h3>本地打开与快速入口</h3>
+          <p>这个页面就是单文件静态站，不依赖构建工具。</p>
+          <div class="command-block">
+            <code>cd /home/vimalinx/Projects/bio_studio
+xdg-open docs/site/index.html
+
+# 或者直接在浏览器里打开
+file:///home/vimalinx/Projects/bio_studio/docs/site/index.html</code>
+          </div>
+          <div class="command-block" style="margin-top: 12px;">
+            <code># 若要从仓库入口开始感受这套工作台
+python scripts/maintenance/generate_env_report.py
+python lib/create_project.py my_analysis --type rnaseq
+cd projects/test_env_validation/scripts
+python run_validation.py</code>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <strong>Bio Studio</strong> 不是整洁到无菌的 demo 仓库。
+        它更接近一张还在继续扩展的 AI 生物计算操作桌。
+      </div>
+      <div>
+        页面依据当前本地仓库扫描生成，重点反映结构、角色与工作方式，而不是宣传口号。
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      }
+    }, {
+      threshold: 0.08,
+      rootMargin: "0px 0px -8% 0px"
+    });
+
+    document.querySelectorAll(".reveal, .panel, .subsection, .table-card, .callout, .layer").forEach((node) => {
+      observer.observe(node);
+    });
+
+    const navLinks = Array.from(document.querySelectorAll(".topnav a"));
+    const sections = navLinks
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const id = "#" + entry.target.id;
+        const link = navLinks.find((item) => item.getAttribute("href") === id);
+        if (!link) return;
+        if (entry.isIntersecting) {
+          navLinks.forEach((item) => item.classList.remove("active"));
+          link.classList.add("active");
+        }
+      });
+    }, {
+      threshold: 0.28,
+      rootMargin: "-12% 0px -58% 0px"
+    });
+
+    sections.forEach((section) => navObserver.observe(section));
+  </script>
+</body>
+</html>
