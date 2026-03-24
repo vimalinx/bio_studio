@@ -11,14 +11,18 @@ mRNA设计与优化工具
 """
 
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC
+from Bio.SeqUtils import gc_fraction
 import numpy as np
-import pandas as pd
 from pathlib import Path
 import json
 from typing import Dict, List, Tuple
 import warnings
 warnings.filterwarnings('ignore')
+
+
+def GC(sequence) -> float:
+    """兼容新版 Biopython，返回百分比 GC。"""
+    return gc_fraction(sequence) * 100
 
 
 class MRNAOptimizer:
@@ -428,6 +432,7 @@ class MRNAOptimizer:
             output_prefix: 输出文件前缀
         """
         output_path = Path(output_prefix)
+        import pandas as pd
 
         # 1. 导出FASTA
         fasta_file = output_path.with_suffix('.fa')
@@ -510,12 +515,9 @@ class MRNAOptimizer:
                 target_gc=45
             )
 
-
-# ============ 命令行界面 ============
-import click
-
-
 def main():
+    import click
+
     @click.command()
     @click.option('--protein', '-p', required=True, help='蛋白质序列或文件')
     @click.option('--output', '-o', default='mrna_design', help='输出文件前缀')

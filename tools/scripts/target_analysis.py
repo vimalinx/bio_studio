@@ -10,10 +10,10 @@
 """
 
 import requests
-import pandas as pd
 import numpy as np
 from pathlib import Path
 import json
+from datetime import datetime
 from typing import Dict, List
 import warnings
 warnings.filterwarnings('ignore')
@@ -457,7 +457,7 @@ class TargetAnalyzer:
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(f"# 靶点分析报告\n\n")
             f.write(f"**靶点**: {report['target_id']}\n\n")
-            f.write(f"**分析日期**: {pd.Timestamp.now().strftime('%Y-%m-%d')}\n\n")
+            f.write(f"**分析日期**: {datetime.now().strftime('%Y-%m-%d')}\n\n")
 
             # 综合评分
             f.write(f"## 综合评分\n\n")
@@ -551,11 +551,9 @@ class TargetAnalyzer:
             f.write(html)
 
 
-# ============ 命令行界面 ============
-import click
-
-
 def main():
+    import click
+
     @click.command()
     @click.option('--target', '-t', required=True, help='靶点ID (基因符号或Entrez ID)')
     @click.option('--id-type', type=click.Choice(['gene_symbol', 'entrez', 'ensembl']),

@@ -396,7 +396,7 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
 # 主程序
 # ============================================================
 
-async def main():
+async def main_async():
     """启动MCP服务器"""
     async with stdio_server() as (read_stream, write_stream):
         await server.run(
@@ -405,5 +405,11 @@ async def main():
             server.create_initialization_options()
         )
 
+
+def main():
+    """同步入口，供 console script 调用。"""
+    asyncio.run(main_async())
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

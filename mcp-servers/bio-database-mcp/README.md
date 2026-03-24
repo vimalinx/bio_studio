@@ -36,32 +36,51 @@
    - 亚细胞定位
    - 分子量计算
 
+7. **get_server_config_status** - 查看当前服务配置状态
+   - Entrez邮箱是否已配置
+   - API key是否已配置
+   - 返回推荐环境变量名
+
 ## 安装
 
 ```bash
 pip install -e .
 ```
 
-**重要**: 首次使用前需要配置NCBI邮箱（在代码中设置）：
-```python
-from Bio import Entrez
-Entrez.email = "your-email@example.com"
+**重要**: 首次使用前请配置 NCBI 身份信息：
+```bash
+export BIO_STUDIO_ENTREZ_EMAIL="you@example.com"
+# 可选：提高默认请求配额
+export BIO_STUDIO_NCBI_API_KEY="your_ncbi_api_key"
 ```
 
 ## 使用方法
 
 ### 配置Claude Code
 
+建议先在仓库根目录渲染当前配置：
+
+```bash
+python mcp-servers/render_claude_config.py --write mcp-servers/claude-config.json
+```
+
 ```json
 {
   "mcpServers": {
     "bio-database": {
-      "command": "python",
-      "args": ["/path/to/bio_studio/mcp-servers/bio-database-mcp/database_server.py"]
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": ["/home/vimalinx/Projects/bio_studio/mcp-servers/bio-database-mcp/database_server.py"]
     }
   }
 }
 ```
+
+### 配置状态检查
+
+服务提供 `get_server_config_status` 工具，可在 Claude / agent 里直接检查：
+- Entrez 邮箱是否已配置
+- API key 是否已配置
+- 当前读取的是哪个环境变量名
 
 ### 示例对话
 

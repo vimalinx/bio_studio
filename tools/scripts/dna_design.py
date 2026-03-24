@@ -10,16 +10,20 @@ DNA设计工具 - 从蛋白质序列反推DNA序列并进行优化
 """
 
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC, gc_fraction
+from Bio.SeqUtils import gc_fraction
 from Bio.SeqUtils.MeltingTemp import Tm_Wallace
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
-import pandas as pd
 import numpy as np
 from pathlib import Path
 import json
 import warnings
 warnings.filterwarnings('ignore')
+
+
+def GC(sequence) -> float:
+    """兼容新版 Biopython，返回百分比 GC。"""
+    return gc_fraction(sequence) * 100
 
 
 class DNADesigner:

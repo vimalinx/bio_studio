@@ -94,13 +94,68 @@ AI: [调用 bio-database.run_blast]
 
 ---
 
+### 4️⃣ bio-design-mcp - 生物设计服务器
+
+**功能**:
+- 蛋白质序列反推 DNA 设计
+- mRNA 序列设计与表达级别优化
+- 靶点可成药性/安全性/竞争格局基础评估
+- 设计模块可用性检查
+
+**使用示例**:
+```
+用户: 给这个蛋白设计一个偏 E.coli 表达的DNA序列: MKT
+
+AI: [调用 bio-design.design_dna]
+    结果:
+    - DNA序列: ATGAAGACC
+    - 长度: 9 bp
+    - GC含量: 33.33%
+```
+
+**位置**: `mcp-servers/bio-design-mcp/`
+
+---
+
+### 5️⃣ bio-lab-mcp - 工作区实验编排服务器
+
+**功能**:
+- 列出工作区项目与统一入口状态
+- 读取项目配置、自检摘要和所需工具
+- 调用项目级 `validate_project.py`
+- 调用工作区级 `workspace-validate` smoke test
+- 读取项目 pipeline 步骤说明
+
+**使用示例**:
+```
+用户: 看一下这个工作区有哪些可运行项目
+
+AI: [调用 bio-lab.list_workspace_projects]
+    结果:
+    - ai_design_playground
+    - test_env_validation
+    - yeast_rnaseq_demo
+```
+
+**位置**: `mcp-servers/bio-lab-mcp/`
+
+---
+
+## 🧱 预留槽位
+
+以下目录当前是规划位，不是已实现服务：
+
+- 当前没有新的 MCP 预留目录；后续如果接入真实 lab automation 或 protocol 平台，再单独加位。
+
+---
+
 ## 🚀 快速开始
 
 ### 安装
 
 ```bash
 # 方法1: 自动安装（推荐）
-cd /media/vimalinx/Data/bio_studio/mcp-servers
+cd /home/vimalinx/Projects/bio_studio/mcp-servers
 bash install-all.sh
 
 # 方法2: 手动安装
@@ -113,28 +168,50 @@ pip install -r mcp-requirements.txt
    - **Linux**: `~/.config/claude-code/config.json`
    - **macOS**: `~/Library/Application Support/Claude Code/config.json`
 
-2. 添加MCP服务器配置（见 `claude-config.json`）:
+2. 在当前仓库里生成最新配置:
+
+```bash
+python render_claude_config.py --write claude-config.json
+cat claude-config.json
+```
+
+3. 添加MCP服务器配置（见 `claude-config.json`）:
 
 ```json
 {
   "mcpServers": {
+    "bio-design": {
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": ["/home/vimalinx/Projects/bio_studio/mcp-servers/bio-design-mcp/design_server.py"]
+    },
+    "bio-lab": {
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": ["/home/vimalinx/Projects/bio_studio/mcp-servers/bio-lab-mcp/lab_server.py"]
+    },
     "bio-sequence": {
-      "command": "python",
-      "args": ["/media/vimalinx/Data/bio_studio/mcp-servers/bio-sequence-mcp/sequence_server.py"]
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": ["/home/vimalinx/Projects/bio_studio/mcp-servers/bio-sequence-mcp/sequence_server.py"]
     },
     "bio-structure": {
-      "command": "python",
-      "args": ["/media/vimalinx/Data/bio_studio/mcp-servers/bio-structure-mcp/structure_server.py"]
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": ["/home/vimalinx/Projects/bio_studio/mcp-servers/bio-structure-mcp/structure_server.py"]
     },
     "bio-database": {
-      "command": "python",
-      "args": ["/media/vimalinx/Data/bio_studio/mcp-servers/bio-database-mcp/database_server.py"]
+      "command": "/home/vimalinx/miniforge3/envs/bio/bin/python",
+      "args": ["/home/vimalinx/Projects/bio_studio/mcp-servers/bio-database-mcp/database_server.py"]
     }
   }
 }
 ```
 
-3. 重启Claude Code
+4. 若使用 `bio-database-mcp`，建议先设置:
+
+```bash
+export BIO_STUDIO_ENTREZ_EMAIL="you@example.com"
+export BIO_STUDIO_NCBI_API_KEY="optional_ncbi_api_key"
+```
+
+5. 重启Claude Code
 
 ### 验证安装
 
@@ -144,6 +221,8 @@ pip install -r mcp-requirements.txt
 用户: 检查MCP服务器是否正常工作
 
 AI: 我可以访问以下生物信息学工具:
+    ✅ bio-design-mcp (设计与靶点评估)
+    ✅ bio-lab-mcp (项目发现与验证)
     ✅ bio-sequence-mcp (序列分析)
     ✅ bio-structure-mcp (结构分析)
     ✅ bio-database-mcp (数据库查询)
