@@ -1,124 +1,153 @@
-# Bio Studio - AI协同生物工作区 v2.1
+# Bio Studio
 
-> 一个简洁高效的AI驱动的生物信息学研究环境
+> 面向 AI agent 的生物计算工作台，不是单一分析脚本仓库，也不是单一 Web 应用。
 
-**核心理念**: 项目隔离，原子化模块，AI负责执行
+Bio Studio 把几个层面放在同一个工作区里：
 
----
+- 项目工作区：真实分析任务、数据、日志和报告都优先落在 `projects/`
+- 本地骨架：`lib/`、`scripts/`、项目模板和统一 CLI
+- AI 接口：`mcp-servers/`、skills、介绍页和协议文档
+- 外部引擎：Evo2、Biomni、RFdiffusion、LiteFold 等第三方能力
 
-## 📚 关键文档 (必读)
+如果你是第一次进这个仓库，先看这三个入口：
 
-- **[文档索引](docs/README.md)** 📌: 所有文档入口与导航。
-- **[避坑指南](docs/BEST_PRACTICES.md)** ⚠️: 包含 PATH 设置、Evo2 模型输出处理等关键经验。
-- **[环境清单](docs/ENVIRONMENT.md)** 🛠️: 当前已安装的所有 Python 库和生信工具版本快照。
-- **[工具部署协议](docs/AI_TOOL_PROTOCOL.md)** 🤖: AI 部署新工具的完整流程。
-- **[分析执行协议](docs/AI_ANALYSIS_PROTOCOL.md)** 🧪: 分析流程规范与归档要求。
+- [docs/README.md](docs/README.md)
+- [docs/WORKSPACE_ARCHITECTURE.md](docs/WORKSPACE_ARCHITECTURE.md)
+- [docs/site/index.html](docs/site/index.html)
 
----
+## 这套工作区现在能做什么
 
-## 🎯 这是什么？
+- 用统一入口创建、验证和运行项目：`python scripts/project.py ...`
+- 跑工作区级环境 smoke test：`python scripts/project.py workspace-validate`
+- 复用共享 runtime 和模块执行常见流程，而不是在每个项目里重复写命令
+- 提供 MCP servers 给 AI 直接调用：
+  - `bio-design-mcp`：DNA / mRNA 设计、靶点评估
+  - `bio-lab-mcp`：项目发现、项目级验证、工作区级验证
+  - `bio-sequence-mcp`：序列分析
+  - `bio-structure-mcp`：结构分析
+  - `bio-database-mcp`：NCBI / UniProt / PubMed 查询
+- 保留外部研究引擎源码，但把“如何调用它们”尽量收敛到工作区骨架层
 
-Bio Studio 是重构后的生物信息学工作区，核心改进：
+## 快速开始
 
-- ✅ **AI 深度集成** - 内置 Evo 2 (基因组大模型)、Biomni 等 AI Agent。
-- ✅ **全栈环境** - 预装 50+ 核心生信工具 (BWA, STAR, MultiQC, etc.)。
-- ✅ **项目隔离** - 每个项目完全独立，数据和脚本互不干扰。
-- ✅ **原子化模块** - 通用功能封装在 `lib/`，可复用。
-
-**你只需要用自然语言告诉AI要做什么，它会自动选择工具、执行任务、生成报告。**
-
----
-
-## 🚀 5分钟快速开始
+先进入仓库根目录并激活 `bio` 环境：
 
 ```bash
-# 1. 进入工作区（仓库根目录）
 cd /path/to/bio_studio
-
-# 2. 激活环境（conda 安装路径可能不同）
-# 如果你已经初始化了 conda：
-#   conda activate bio
-# 否则使用 activate 脚本：
 source <conda_install>/bin/activate bio
+```
 
-# 3. 环境体检（生成/更新环境快照）
+然后按这个顺序走：
+
+```bash
+# 查看环境和目录边界
 python scripts/maintenance/generate_env_report.py
 
-# 4. 创建新项目
-python3 lib/create_project.py my_analysis --type rnaseq
+# 创建新项目
+python scripts/project.py create my_analysis --type rnaseq --description "My analysis"
 
-# 5. 运行分析
-cd projects/my_analysis/scripts
-python pipeline.py
+# 先自检，再看步骤
+python scripts/project.py validate my_analysis
+python scripts/project.py steps my_analysis
+
+# 再运行
+python scripts/project.py run my_analysis
+
+# 需要时做工作区级 smoke test
+python scripts/project.py workspace-validate
 ```
 
----
+如果你想先看一个已经接好的项目，而不是从空项目开始，优先看：
 
-## 🔧 已安装工具 (v2.1)
+- [projects/ai_design_playground/README.md](projects/ai_design_playground/README.md)
+- [projects/test_env_validation/README.md](projects/test_env_validation/README.md)
+- [projects/test_rnaseq_analysis/README.md](projects/test_rnaseq_analysis/README.md)
 
-> 版本以 `docs/ENVIRONMENT.md` 为准。
+## 统一入口怎么理解
 
-### 🧬 核心生信工具 (CLI)
-| 类别 | 工具 | 用途 |
-|---|---|---|
-| **质控** | `fastp`, `FastQC`, `MultiQC` | 极速质控与报告汇总 |
-| **比对** | `BWA-MEM`, `Bowtie2`, `STAR`, `HISAT2` | DNA/RNA 序列比对 |
-| **处理** | `Samtools`, `Bcftools`, `Bedtools`, `SeqKit` | BAM/VCF/FASTA 操作 |
-| **分析** | `FeatureCounts`, `IQ-TREE 2`, `MAFFT` | 定量、进化树、多序列比对 |
+工作区主入口是 [scripts/project.py](scripts/project.py)。
 
-### 🤖 AI 与 深度学习
-| 模型/库 | 用途 | 状态 |
-|---|---|---|
-| **Evo 2 (1B)** | 基因组基础模型，预测变异效应 | ✅ 已部署 (Docker) |
-| **ESM** | 蛋白质语言模型 | ✅ 已安装 (Python) |
-| **Biomni** | 生物医学 AI Agent | ✅ 已部署 |
-| **PyTorch 2.5** | 深度学习后端 | ✅ 支持 CUDA (RTX 5070) |
+常用命令：
 
----
-
-## 📁 目录结构
-
+```bash
+python scripts/project.py create <项目名> --type rnaseq
+python scripts/project.py validate <项目名>
+python scripts/project.py steps <项目名>
+python scripts/project.py run <项目名>
+python scripts/project.py workspace-validate
 ```
+
+`run` 的语义不是所有项目都完全一样：
+
+- 模板项目和 demo 项目：通常会直接执行项目 `pipeline.py`
+- 专项项目：会转发到项目自己的定制 pipeline
+- 学习项目：可能只输出下一步教学命令，而不是替你一键跑完整教程
+
+这不是不一致，而是刻意保留项目边界。详细解释见 [docs/WORKSPACE_ARCHITECTURE.md](docs/WORKSPACE_ARCHITECTURE.md)。
+
+## MCP 和 AI 接口
+
+当前 MCP 配置在 [mcp-servers/](mcp-servers/)。
+
+如果你要把这套 MCP servers 接到 Claude Code 或其他 agent 运行时，直接生成配置：
+
+```bash
+cd mcp-servers
+python render_claude_config.py --write claude-config.json
+cat claude-config.json
+```
+
+现在的活跃 MCP servers：
+
+- [mcp-servers/bio-design-mcp/README.md](mcp-servers/bio-design-mcp/README.md)
+- [mcp-servers/bio-lab-mcp/README.md](mcp-servers/bio-lab-mcp/README.md)
+- [mcp-servers/bio-sequence-mcp/README.md](mcp-servers/bio-sequence-mcp/README.md)
+- [mcp-servers/bio-structure-mcp/README.md](mcp-servers/bio-structure-mcp/README.md)
+- [mcp-servers/bio-database-mcp/README.md](mcp-servers/bio-database-mcp/README.md)
+
+## 当前工作区结构
+
+```text
 bio_studio/
-│
-├── lib/                           # ⭐ 通用库（原子化模块）
-│   ├── modules/                   # 可复用的Python模块 (qc, alignment, variant...)
-│   └── create_project.py          # 项目模板生成器
-│
-├── projects/                      # ⭐ 项目目录（每个项目独立）
-│   └── <project_name>/
-│       ├── data/                  # 该项目的数据
-│       ├── scripts/               # 项目脚本
-│       └── README.md              # 项目说明
-│
-├── scripts/                       # ⭐ 系统脚本
-│   └── maintenance/               # 维护与环境脚本 (update_env, generate_report)
-│
-├── repositories/                  # 外部工具源码
-│   └── active/                    # 当前使用的仓库
-│       ├── Biomni/                # 生物医学 AI Agent
-│       ├── evo2/                  # Evo 2 基因组大模型
-│       └── RFdiffusion/           # 蛋白质设计工具
-├── shared_data/                   # 共享参考基因组/数据库
-└── docs/                          # 系统文档
+├── docs/                    # 协议、架构、环境与站点入口
+├── lib/                     # 共享模块、模板 runtime、项目验证辅助
+├── mcp-servers/             # MCP server 接口层
+├── projects/                # 真实项目工作区
+├── repositories/active/     # 第三方引擎源码
+├── scripts/                 # 统一 CLI 和维护脚本
+├── shared_data/             # 共享参考数据
+└── tools/                   # 独立工具脚本
 ```
 
----
+几个最重要的约束：
 
-## 📝 开发日志
+- 真实分析结果优先放 `projects/`，不要把根目录当临时实验场
+- `repositories/active/` 是外部能力层，不是主产品代码层
+- `docs/` 放工作区知识，项目专属说明放项目自己的 `README.md`
+- 想让 AI 可靠调用能力，优先加到 `lib/` 或 `mcp-servers/`，不要只留在一次性脚本里
 
-**v2.1 (2026-01-28)**:
-- 🚀 **实战验证**: 完成酵母菌全流程 RNA-seq 分析 (STAR + featureCounts + Variant Calling)。
-- 🧪 **自动化测试**: 建立 `projects/test_env_validation` 项目，一键验证核心工具链状态。
-- 🧹 **架构治理**: 实施严格的根目录洁癖策略，归档旧数据，确立 "Federal" 联邦制项目架构。
-- 🐛 **脚本修复**: 修正 Evo 2 显存管理、BCFtools 变异检测流程及多个可视化脚本 Bug。
+## 已经沉淀下来的能力面
 
-**v2.0 (2025-01-22)**:
-- ✨ 重构：项目独立架构
-- ✨ 新增：lib/通用模块库
+共享能力不是只在 README 里写写，而是已经有代码和测试支撑：
 
----
+- 项目模板与统一验证入口
+- 工作区 Python / PATH 环境解析
+- 项目级 CLI 工具需求校验
+- demo 项目与特殊项目的统一入口兼容
+- `bio-design-mcp` / `bio-lab-mcp` 的最小可用服务骨架
 
-**现在就开始你的生物研究之旅吧！** 🚀
+变更细节可以直接看 [docs/CHANGELOG.md](docs/CHANGELOG.md)。
 
-有问题？直接问AI。
+## 推荐阅读顺序
+
+1. [README.md](README.md)
+2. [docs/README.md](docs/README.md)
+3. [docs/WORKSPACE_ARCHITECTURE.md](docs/WORKSPACE_ARCHITECTURE.md)
+4. [projects/test_env_validation/README.md](projects/test_env_validation/README.md)
+5. [projects/ai_design_playground/README.md](projects/ai_design_playground/README.md)
+
+## 注意事项
+
+- 这个仓库包含很多“工作区资产”，不只是源代码，还包括项目脚本、测试、文档和第三方引擎入口
+- 一些目录可能存在本地工作树修改，这是研究型工作区的常态，不代表都适合直接公开发布
+- 如果要对外发布，先确认哪些结果、日志、站点文件和第三方子模块状态应该一起带出去
