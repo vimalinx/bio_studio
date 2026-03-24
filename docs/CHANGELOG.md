@@ -2,6 +2,12 @@
 
 记录工具部署、分析流程和环境变更。每次操作完成后追加一条记录。
 
+## [2026-03-25] - 主仓整洁度：忽略外部引擎子模块内部脏状态
+- **操作**: 更新 `.gitmodules`，为 `repositories/active/RFdiffusion` 与 `repositories/active/litefold/source` 增加 `ignore = dirty`；同步更新 `repositories/README.md` 说明主仓与外部引擎仓库的边界
+- **结果**: 成功
+- **影响**: 主仓 `git status` 不再因外部引擎子模块内部的本地未提交改动而持续显示脏状态；真正的子模块指针变化仍会保留为主仓可见变更
+- **验证**: `git status --short --ignore-submodules=dirty`
+
 ## [2026-03-24] - 统一 CLI：学习项目 run 返回工作区级引导
 - **操作**: 更新 `scripts/project.py`，在 `run` 子命令下向项目 pipeline 透传工作区 CLI 上下文；升级 `projects/yeast_genome_learning/scripts/pipeline.py`，在经由统一入口调用时输出工作区级 `steps` / `validate` 后续命令；补充 `tests/test_workspace_project_cli.py` 对专项项目 `validate` / `steps` 与学习项目 `run` 引导的覆盖；同步更新 `README.md`、`docs/README.md`、`docs/AI_ANALYSIS_PROTOCOL.md` 与 `docs/WORKSPACE_ARCHITECTURE.md`
 - **结果**: 成功

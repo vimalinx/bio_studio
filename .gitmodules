@@ -1,6 +1,8 @@
 [submodule "RFdiffusion"]
 	path = repositories/active/RFdiffusion
 	url = https://github.com/RosettaCommons/RFdiffusion.git
+	ignore = dirty
 [submodule "litefold-source"]
 	path = repositories/active/litefold/source
 	url = https://github.com/Anindyadeep/litefold.git
+	ignore = dirty
