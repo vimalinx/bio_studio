@@ -2,6 +2,12 @@
 
 记录工具部署、分析流程和环境变更。每次操作完成后追加一条记录。
 
+## [2026-03-25] - CI 兼容性：修复干净 clone 下的稳定测试
+- **操作**: 为 `ai_design_playground`、`yeast_rnaseq_demo`、`test_env_validation`、`test_rnaseq_analysis` 补充空目录 `.gitkeep` 占位文件；更新 `tests/test_mcp_config_render.py`，不再把 `claude-config.json` 中的本机绝对路径硬编码为固定断言
+- **结果**: 成功
+- **影响**: GitHub Actions 在全新 checkout 上运行稳定测试时，不再依赖维护者机器上的现存空目录或本机路径
+- **验证**: `bash scripts/ci/run_stable_tests.sh`
+
 ## [2026-03-25] - GitHub Actions：落地只读安全 CI
 - **操作**: 新增 `.github/workflows/ci.yml`，仅在 `push` / `pull_request` / `workflow_dispatch` 下运行稳定测试；配置 `contents: read`、`persist-credentials: false`、`concurrency.cancel-in-progress: true`；新增 `requirements-ci.txt` 与 `scripts/ci/run_stable_tests.sh`；新增 `tests/test_github_actions_ci.py` 防止 workflow 漂移回 `schedule`、`workflow_run`、自动提交或自动 push
 - **结果**: 成功

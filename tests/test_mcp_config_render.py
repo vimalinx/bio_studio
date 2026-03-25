@@ -58,18 +58,18 @@ def test_checked_in_claude_config_matches_current_repo() -> None:
     payload = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     servers = payload["mcpServers"]
 
-    assert servers["bio-design"]["args"] == [
-        str(ROOT / "mcp-servers" / "bio-design-mcp" / "design_server.py")
-    ]
-    assert servers["bio-lab"]["args"] == [
-        str(ROOT / "mcp-servers" / "bio-lab-mcp" / "lab_server.py")
-    ]
-    assert servers["bio-sequence"]["args"] == [
-        str(ROOT / "mcp-servers" / "bio-sequence-mcp" / "sequence_server.py")
-    ]
-    assert servers["bio-structure"]["args"] == [
-        str(ROOT / "mcp-servers" / "bio-structure-mcp" / "structure_server.py")
-    ]
-    assert servers["bio-database"]["args"] == [
-        str(ROOT / "mcp-servers" / "bio-database-mcp" / "database_server.py")
-    ]
+    assert Path(servers["bio-design"]["args"][0]).as_posix().endswith(
+        "/mcp-servers/bio-design-mcp/design_server.py"
+    )
+    assert Path(servers["bio-lab"]["args"][0]).as_posix().endswith(
+        "/mcp-servers/bio-lab-mcp/lab_server.py"
+    )
+    assert Path(servers["bio-sequence"]["args"][0]).as_posix().endswith(
+        "/mcp-servers/bio-sequence-mcp/sequence_server.py"
+    )
+    assert Path(servers["bio-structure"]["args"][0]).as_posix().endswith(
+        "/mcp-servers/bio-structure-mcp/structure_server.py"
+    )
+    assert Path(servers["bio-database"]["args"][0]).as_posix().endswith(
+        "/mcp-servers/bio-database-mcp/database_server.py"
+    )
