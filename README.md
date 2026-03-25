@@ -133,6 +133,13 @@ python scripts/litefold.py status
 python scripts/litefold.py status --json
 ```
 
+如果你要看它现在到底能不能被当前 Python 环境启动，先跑预检：
+
+```bash
+python scripts/litefold.py preflight
+python scripts/litefold.py preflight --json
+```
+
 如果已经有 LiteFold 服务在跑，可以直接探活：
 
 ```bash
@@ -145,7 +152,14 @@ python scripts/litefold.py health --url http://localhost:7114
 python scripts/litefold.py print-selfhosted-command
 ```
 
-这层桥接目前只负责发现、体检和打印推荐入口，仍然遵守一个原则：
+如果你想先看桥接层准备怎么起服务，而不真的执行：
+
+```bash
+python scripts/litefold.py start-selfhosted --dry-run
+python scripts/litefold.py start-selfhosted --dry-run --json
+```
+
+这层桥接目前负责发现、预检、体检和启动包装，仍然遵守一个原则：
 
 - `repositories/active/litefold/source` 是上游引擎工作树
 - 工作区优先在外层做封装和治理，不默认修改上游源码

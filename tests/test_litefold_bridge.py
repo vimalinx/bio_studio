@@ -14,10 +14,60 @@ def _create_fake_litefold_workspace(workspace_root: Path) -> Path:
     source_dir = workspace_root / "repositories" / "active" / "litefold" / "source"
     selfhosted_dir = source_dir / "litefold" / "selfhosted"
     selfhosted_dir.mkdir(parents=True)
+    managed_dir = source_dir / "litefold" / "managed"
+    managed_dir.mkdir(parents=True)
 
     (source_dir / "README.md").write_text("# LiteFold\n", encoding="utf-8")
     (selfhosted_dir / "Dockerfile").write_text("FROM scratch\n", encoding="utf-8")
-    (selfhosted_dir / "selfhosted.py").write_text("print('litefold')\n", encoding="utf-8")
+    (selfhosted_dir / "__init__.py").write_text("", encoding="utf-8")
+    (selfhosted_dir / "selfhosted.py").write_text(
+        "\n".join(
+            [
+                "from fastapi import FastAPI",
+                "from sqlalchemy.orm import Session",
+                "import torch",
+                "from litefold.selfhosted.models import Job",
+                "from fold_models import ESMFold",
+                "from selfhosted.constants import CUDA_DEVICE",
+                "from Bio.PDB import PDBParser",
+                "import biotite.structure.io as bsio",
+                "",
+                "app = FastAPI()",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (selfhosted_dir / "models.py").write_text(
+        "\n".join(
+            [
+                "from sqlalchemy import create_engine",
+                "from selfhosted.constants import SQLALCHEMY_DATABASE_URL",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (selfhosted_dir / "schemas.py").write_text(
+        "\n".join(
+            [
+                "from pydantic import BaseModel",
+                "import numpy as np",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (selfhosted_dir / "constants.py").write_text(
+        "CUDA_DEVICE = 'cuda:0'\nSQLALCHEMY_DATABASE_URL = 'sqlite:///db/jobs.db'\n",
+        encoding="utf-8",
+    )
+    (source_dir / "litefold" / "fold_models").mkdir(parents=True)
+    (source_dir / "litefold" / "fold_models" / "__init__.py").write_text("", encoding="utf-8")
+    (managed_dir / "requirements.txt").write_text(
+        "fastapi==0.104.1\nsqlalchemy==2.0.23\npydantic>=2.4.2\n",
+        encoding="utf-8",
+    )
     return selfhosted_dir
 
 
@@ -37,7 +87,8 @@ def test_collect_status_reports_vendored_litefold_layout(tmp_path: Path, monkeyp
     assert status["selfhosted_requirements_exists"] is False
     assert status["docker_available"] is True
     assert status["recommended_launch_mode"] == "python"
-    assert status["recommended_launch_command"].endswith("python selfhosted.py")
+    assert "PYTHONPATH=" in status["recommended_launch_command"]
+    assert status["recommended_launch_command"].endswith("selfhosted.py")
     assert status["expected_endpoints"] == ["/health", "/predict", "/status/{job_id}"]
 
 
@@ -118,3 +169,72 @@ def test_litefold_cli_status_json_reports_bridge_status(tmp_path: Path) -> None:
     assert payload["source_dir_exists"] is True
     assert payload["recommended_launch_mode"] == "python"
     assert "selfhosted.py" in payload["recommended_launch_command"]
+
+
+def test_collect_preflight_reports_dependency_candidates(tmp_path: Path, monkeypatch) -> None:
+    _create_fake_litefold_workspace(tmp_path)
+
+    from lib import litefold_bridge
+
+    monkeypatch.setattr(
+        litefold_bridge,
+        "probe_python_modules",
+        lambda python_executable, module_names: {
+            "python_executable": python_executable,
+            "checked_modules": module_names,
+            "missing_modules": ["torch"],
+            "ok": False,
+        },
+    )
+
+    preflight = litefold_bridge.collect_preflight(
+        workspace_root=tmp_path,
+        python_executable="python",
+    )
+
+    assert preflight["launch_context"]["cwd"].endswith("/source/litefold")
+    assert preflight["launch_context"]["script_path"].endswith("/source/litefold/selfhosted/selfhosted.py")
+    assert any(path.endswith("/source") for path in preflight["launch_context"]["pythonpath_entries"])
+    assert any(path.endswith("/source/litefold") for path in preflight["launch_context"]["pythonpath_entries"])
+    assert preflight["external_python_modules"] == [
+        "Bio",
+        "biotite",
+        "fastapi",
+        "numpy",
+        "pydantic",
+        "sqlalchemy",
+        "torch",
+    ]
+    assert preflight["module_probe"]["missing_modules"] == ["torch"]
+    assert preflight["requirements_candidates"][0]["path"].endswith("/managed/requirements.txt")
+    assert preflight["requirements_candidates"][0]["packages"] == [
+        "fastapi==0.104.1",
+        "sqlalchemy==2.0.23",
+        "pydantic>=2.4.2",
+    ]
+
+
+def test_litefold_cli_start_selfhosted_dry_run_json_prints_launch_plan(tmp_path: Path) -> None:
+    _create_fake_litefold_workspace(tmp_path)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(CLI),
+            "start-selfhosted",
+            "--workspace-root",
+            str(tmp_path),
+            "--dry-run",
+            "--json",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+    assert payload["dry_run"] is True
+    assert payload["launch_context"]["cwd"].endswith("/source/litefold")
+    assert payload["command"][-1].endswith("selfhosted.py")
+    assert any(path.endswith("/source") for path in payload["launch_context"]["pythonpath_entries"])
