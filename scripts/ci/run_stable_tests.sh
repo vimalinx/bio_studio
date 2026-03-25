@@ -22,5 +22,6 @@ python -m pytest \
   tests/test_mcp_readme_paths.py \
   tests/test_database_mcp_server_config.py \
   tests/test_design_tool_script_compat.py \
+  tests/test_litefold_bridge.py \
   tests/test_github_actions_ci.py \
   -q

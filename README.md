@@ -105,6 +105,51 @@ cat claude-config.json
 - [mcp-servers/bio-structure-mcp/README.md](mcp-servers/bio-structure-mcp/README.md)
 - [mcp-servers/bio-database-mcp/README.md](mcp-servers/bio-database-mcp/README.md)
 
+## 安全 CI 和发布护栏
+
+这个仓库现在已经接上最小、只读的 GitHub Actions 稳定测试链：
+
+- workflow 只跑 `Stable Tests`
+- 权限是只读 `contents: read`
+- 不做自动 commit、自动 push、自动开 PR
+- 不使用 `schedule`、`workflow_run`、`pull_request_target`
+
+本地想复用同一条稳定链，直接运行：
+
+```bash
+bash scripts/ci/run_stable_tests.sh
+```
+
+这条链是“仓库治理护栏”，不是重型生信计算入口。它的目标是稳，不是把整套研究环境搬进 Actions。
+
+## LiteFold 桥接入口
+
+LiteFold 当前通过工作区桥接脚本接入，而不是直接改写 vendored 上游源码。
+
+可以先看工作区识别到的状态：
+
+```bash
+python scripts/litefold.py status
+python scripts/litefold.py status --json
+```
+
+如果已经有 LiteFold 服务在跑，可以直接探活：
+
+```bash
+python scripts/litefold.py health --url http://localhost:7114
+```
+
+如果你只是想知道当前工作区建议怎么从 vendored LiteFold 启动 self-hosted 入口：
+
+```bash
+python scripts/litefold.py print-selfhosted-command
+```
+
+这层桥接目前只负责发现、体检和打印推荐入口，仍然遵守一个原则：
+
+- `repositories/active/litefold/source` 是上游引擎工作树
+- 工作区优先在外层做封装和治理，不默认修改上游源码
+
 ## 当前工作区结构
 
 ```text
