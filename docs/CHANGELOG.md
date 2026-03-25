@@ -2,6 +2,12 @@
 
 记录工具部署、分析流程和环境变更。每次操作完成后追加一条记录。
 
+## [2026-03-25] - GitHub Actions：落地只读安全 CI
+- **操作**: 新增 `.github/workflows/ci.yml`，仅在 `push` / `pull_request` / `workflow_dispatch` 下运行稳定测试；配置 `contents: read`、`persist-credentials: false`、`concurrency.cancel-in-progress: true`；新增 `requirements-ci.txt` 与 `scripts/ci/run_stable_tests.sh`；新增 `tests/test_github_actions_ci.py` 防止 workflow 漂移回 `schedule`、`workflow_run`、自动提交或自动 push
+- **结果**: 成功
+- **影响**: 仓库获得默认安全的 CI 基线，避免因自触发链条、写回仓库或重型环境安装导致 GitHub Actions 重复运行和风控风险
+- **验证**: `python -m pytest tests/test_github_actions_ci.py -q`；`bash scripts/ci/run_stable_tests.sh`
+
 ## [2026-03-25] - 主仓整洁度：忽略外部引擎子模块内部脏状态
 - **操作**: 更新 `.gitmodules`，为 `repositories/active/RFdiffusion` 与 `repositories/active/litefold/source` 增加 `ignore = dirty`；同步更新 `repositories/README.md` 说明主仓与外部引擎仓库的边界
 - **结果**: 成功
