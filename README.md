@@ -140,6 +140,25 @@ python scripts/litefold.py preflight
 python scripts/litefold.py preflight --json
 ```
 
+预检会把两类东西一起告诉你：
+
+- 当前 Python 环境还缺哪些 LiteFold 依赖
+- 主仓库维护的 LiteFold 安装资产在哪里
+
+如果缺包，先看 dry-run 安装计划：
+
+```bash
+bash scripts/setup/setup_litefold_env.sh --dry-run
+```
+
+真正要补全环境时，再执行：
+
+```bash
+bash scripts/setup/setup_litefold_env.sh
+```
+
+这套安装脚本默认使用仓库里的 [requirements-litefold-selfhosted.txt](requirements-litefold-selfhosted.txt)。
+
 如果已经有 LiteFold 服务在跑，可以直接探活：
 
 ```bash

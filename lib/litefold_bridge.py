@@ -34,6 +34,7 @@ class LiteFoldLayout:
     selfhosted_requirements: Path
     managed_requirements: Path
     selfhosted_deployments_dir: Path
+    fold_models_dir: Path
 
 
 def resolve_litefold_layout(workspace_root: Path | str | None = None) -> LiteFoldLayout:
@@ -54,7 +55,27 @@ def resolve_litefold_layout(workspace_root: Path | str | None = None) -> LiteFol
         selfhosted_requirements=selfhosted_dir / "requirements.txt",
         managed_requirements=litefold_dir / "managed" / "requirements.txt",
         selfhosted_deployments_dir=litefold_dir / "selfhosted_deployments",
+        fold_models_dir=litefold_dir / "fold_models",
     )
+
+
+def resolve_workspace_installation_assets(
+    workspace_root: Path | str | LiteFoldLayout | None = None,
+) -> dict[str, str | bool]:
+    layout = workspace_root if isinstance(workspace_root, LiteFoldLayout) else resolve_litefold_layout(workspace_root)
+    requirements_file = layout.workspace_root / "requirements-litefold-selfhosted.txt"
+    setup_script = layout.workspace_root / "scripts" / "setup" / "setup_litefold_env.sh"
+    install_command = (
+        f"bash {shlex.quote(str(setup_script))} "
+        f"--workspace-root {shlex.quote(str(layout.workspace_root))}"
+    )
+    return {
+        "requirements_file": str(requirements_file),
+        "requirements_file_exists": requirements_file.exists(),
+        "setup_script": str(setup_script),
+        "setup_script_exists": setup_script.exists(),
+        "install_command": install_command,
+    }
 
 
 def build_pythonpath_entries(
@@ -206,8 +227,12 @@ def collect_requirement_candidates(
     return candidates
 
 
-def _iter_selfhosted_python_files(layout: LiteFoldLayout) -> list[Path]:
-    return sorted(layout.selfhosted_dir.glob("*.py"))
+def _iter_bridge_python_files(layout: LiteFoldLayout) -> list[Path]:
+    python_files: list[Path] = []
+    for directory in (layout.selfhosted_dir, layout.fold_models_dir):
+        if directory.is_dir():
+            python_files.extend(sorted(directory.rglob("*.py")))
+    return python_files
 
 
 def _local_module_roots(layout: LiteFoldLayout) -> set[str]:
@@ -229,7 +254,7 @@ def collect_external_python_modules(
     stdlib_modules = set(getattr(sys, "stdlib_module_names", set()))
     local_roots = _local_module_roots(layout)
 
-    for path in _iter_selfhosted_python_files(layout):
+    for path in _iter_bridge_python_files(layout):
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         except SyntaxError:
@@ -301,12 +326,17 @@ def collect_preflight(
     module_probe = probe_python_modules(python_executable, external_modules)
     requirements_candidates = collect_requirement_candidates(layout)
     start_plan = build_start_plan(layout, python_executable=python_executable)
+    workspace_installation = resolve_workspace_installation_assets(layout)
 
     warnings = []
     if not requirements_candidates:
         warnings.append("没有发现可直接复用的 LiteFold requirements 候选文件。")
     if module_probe.get("missing_modules"):
         warnings.append("当前 Python 环境缺少 LiteFold self-hosted 所需模块。")
+    if not workspace_installation["requirements_file_exists"]:
+        warnings.append("工作区缺少 LiteFold 专用 requirements 文件。")
+    if not workspace_installation["setup_script_exists"]:
+        warnings.append("工作区缺少 LiteFold setup 脚本。")
 
     return {
         "status": collect_status(workspace_root=layout.workspace_root),
@@ -315,9 +345,13 @@ def collect_preflight(
         "external_python_modules": external_modules,
         "module_probe": module_probe,
         "requirements_candidates": requirements_candidates,
+        "workspace_installation": workspace_installation,
         "warnings": warnings,
         "ready_to_launch": bool(
-            layout.selfhosted_script.exists() and not module_probe.get("missing_modules")
+            layout.selfhosted_script.exists()
+            and not module_probe.get("missing_modules")
+            and workspace_installation["requirements_file_exists"]
+            and workspace_installation["setup_script_exists"]
         ),
     }
 

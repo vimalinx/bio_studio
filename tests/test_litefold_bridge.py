@@ -16,6 +16,10 @@ def _create_fake_litefold_workspace(workspace_root: Path) -> Path:
     selfhosted_dir.mkdir(parents=True)
     managed_dir = source_dir / "litefold" / "managed"
     managed_dir.mkdir(parents=True)
+    fold_models_dir = source_dir / "litefold" / "fold_models" / "esmfold"
+    fold_models_dir.mkdir(parents=True)
+    setup_dir = workspace_root / "scripts" / "setup"
+    setup_dir.mkdir(parents=True)
 
     (source_dir / "README.md").write_text("# LiteFold\n", encoding="utf-8")
     (selfhosted_dir / "Dockerfile").write_text("FROM scratch\n", encoding="utf-8")
@@ -62,10 +66,30 @@ def _create_fake_litefold_workspace(workspace_root: Path) -> Path:
         "CUDA_DEVICE = 'cuda:0'\nSQLALCHEMY_DATABASE_URL = 'sqlite:///db/jobs.db'\n",
         encoding="utf-8",
     )
-    (source_dir / "litefold" / "fold_models").mkdir(parents=True)
     (source_dir / "litefold" / "fold_models" / "__init__.py").write_text("", encoding="utf-8")
+    (fold_models_dir / "main.py").write_text(
+        "\n".join(
+            [
+                "import torch",
+                "import esm",
+                "from scipy.stats import truncnorm",
+                "from einops import rearrange",
+                "import tree",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     (managed_dir / "requirements.txt").write_text(
         "fastapi==0.104.1\nsqlalchemy==2.0.23\npydantic>=2.4.2\n",
+        encoding="utf-8",
+    )
+    (workspace_root / "requirements-litefold-selfhosted.txt").write_text(
+        "fastapi==0.104.1\nuvicorn==0.24.0\nbiopython==1.79\nbiotite>=0.38.0\n",
+        encoding="utf-8",
+    )
+    (setup_dir / "setup_litefold_env.sh").write_text(
+        "#!/bin/bash\nset -e\n",
         encoding="utf-8",
     )
     return selfhosted_dir
@@ -199,11 +223,15 @@ def test_collect_preflight_reports_dependency_candidates(tmp_path: Path, monkeyp
     assert preflight["external_python_modules"] == [
         "Bio",
         "biotite",
+        "einops",
+        "esm",
         "fastapi",
         "numpy",
         "pydantic",
+        "scipy",
         "sqlalchemy",
         "torch",
+        "tree",
     ]
     assert preflight["module_probe"]["missing_modules"] == ["torch"]
     assert preflight["requirements_candidates"][0]["path"].endswith("/managed/requirements.txt")
@@ -212,6 +240,9 @@ def test_collect_preflight_reports_dependency_candidates(tmp_path: Path, monkeyp
         "sqlalchemy==2.0.23",
         "pydantic>=2.4.2",
     ]
+    assert preflight["workspace_installation"]["requirements_file"].endswith("/requirements-litefold-selfhosted.txt")
+    assert preflight["workspace_installation"]["setup_script"].endswith("/scripts/setup/setup_litefold_env.sh")
+    assert preflight["workspace_installation"]["install_command"].startswith("bash ")
 
 
 def test_litefold_cli_start_selfhosted_dry_run_json_prints_launch_plan(tmp_path: Path) -> None:
@@ -238,3 +269,27 @@ def test_litefold_cli_start_selfhosted_dry_run_json_prints_launch_plan(tmp_path:
     assert payload["launch_context"]["cwd"].endswith("/source/litefold")
     assert payload["command"][-1].endswith("selfhosted.py")
     assert any(path.endswith("/source") for path in payload["launch_context"]["pythonpath_entries"])
+
+
+def test_setup_litefold_env_script_supports_dry_run_for_target_workspace(tmp_path: Path) -> None:
+    _create_fake_litefold_workspace(tmp_path)
+    script_path = ROOT / "scripts" / "setup" / "setup_litefold_env.sh"
+
+    result = subprocess.run(
+        [
+            "bash",
+            str(script_path),
+            "--workspace-root",
+            str(tmp_path),
+            "--python-executable",
+            sys.executable,
+            "--dry-run",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    assert "requirements-litefold-selfhosted.txt" in result.stdout
+    assert f"{sys.executable} -m pip install -r" in result.stdout

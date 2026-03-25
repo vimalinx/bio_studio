@@ -1,0 +1,12 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+sqlalchemy==2.0.23
+numpy>=1.23.5
+torch>=2.0.0
+biopython==1.79
+biotite>=0.38.0
+pydantic>=2.4.2
+fair-esm>=2.0.0
+scipy>=1.10.0
+einops>=0.7.0
+dm-tree>=0.1.8

@@ -101,6 +101,9 @@ def cmd_preflight(args: argparse.Namespace) -> int:
         print("Requirement candidates:")
         for candidate in payload["requirements_candidates"]:
             print(f"- {candidate['path']}")
+    print(f"Workspace requirements: {payload['workspace_installation']['requirements_file']}")
+    print(f"Workspace setup script: {payload['workspace_installation']['setup_script']}")
+    print(f"Install command: {payload['workspace_installation']['install_command']}")
     for warning in payload["warnings"]:
         print(f"Warning: {warning}")
     return 0
