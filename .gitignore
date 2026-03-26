@@ -66,6 +66,7 @@ repositories/active/evo2/huggingface_cache/
 
 # 临时目录
 tmp/
+.worktrees/
 
 # 保留目录结构
 !.gitkeep

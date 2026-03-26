@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bio Studio | 中文设计评估页</title>
+  <meta
+    name="description"
+    content="Bio Studio 本地 AI 生物工作区设计评估中文页：平台定位、当前完整度、主干结构、金路径与下一步开发顺序。"
+  >
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --bg-strong: #ece4d6;
+      --surface: #fbf8f3;
+      --surface-2: #f6f1e8;
+      --ink: #181411;
+      --muted: #655c54;
+      --line: rgba(24, 20, 17, 0.14);
+      --line-strong: rgba(24, 20, 17, 0.24);
+      --accent: #9c3d24;
+      --accent-soft: rgba(156, 61, 36, 0.12);
+      --teal: #1d5b63;
+      --teal-soft: rgba(29, 91, 99, 0.12);
+      --olive: #556247;
+      --olive-soft: rgba(85, 98, 71, 0.12);
+      --gold: #ad7a1f;
+      --gold-soft: rgba(173, 122, 31, 0.14);
+      --shadow: 0 16px 40px rgba(41, 30, 22, 0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --content: 1320px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(29, 91, 99, 0.12), transparent 28%),
+        radial-gradient(circle at left center, rgba(156, 61, 36, 0.10), transparent 24%),
+        linear-gradient(var(--bg), var(--bg));
+      font-family: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.58;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(24, 20, 17, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 20, 17, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 92%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    code {
+      font-family: "IBM Plex Mono", "JetBrains Mono", "SFMono-Regular", "Consolas", monospace;
+      font-size: 12.5px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+
+    .shell {
+      width: min(calc(100% - 32px), var(--content));
+      margin: 0 auto;
+      padding: 20px 0 72px;
+      position: relative;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 10px 0 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(244, 239, 230, 0.86);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: var(--bg);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .brand-copy span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .topnav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .topnav a {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .topnav a:hover {
+      color: var(--ink);
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+
+    .panel,
+    .subsection,
+    .callout,
+    .layer {
+      background: rgba(251, 248, 243, 0.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 30px 30px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -64px;
+      top: -64px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(29, 91, 99, 0.17), transparent 72%);
+      pointer-events: none;
+    }
+
+    .eyeline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .token {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .token strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(34px, 4vw, 60px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+      max-width: 11ch;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 62ch;
+      color: #403932;
+      font-size: 17px;
+    }
+
+    .hero-note {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .hero-note strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .hero-note span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .overview {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    h2,
+    h3 {
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    .overview p,
+    .section-header p,
+    .subsection p,
+    .callout p,
+    .layer-copy p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .signal {
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .signal strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+    }
+
+    .signal span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend {
+      display: grid;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .legend div {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .legend b {
+      font-weight: 600;
+    }
+
+    .legend span {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .section {
+      margin-top: 26px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-header .copy {
+      max-width: 780px;
+    }
+
+    .section-header .kicker {
+      color: var(--muted);
+      font-size: 12px;
+      padding-bottom: 4px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .subsection,
+    .callout {
+      padding: 20px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .bar {
+      display: grid;
+      gap: 6px;
+    }
+
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .track {
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(24, 20, 17, 0.08);
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--ink), var(--accent));
+    }
+
+    .fill.teal {
+      background: linear-gradient(90deg, var(--teal), #2d7982);
+    }
+
+    .fill.olive {
+      background: linear-gradient(90deg, var(--olive), #728362);
+    }
+
+    .layer-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 88px 1fr 310px;
+      gap: 18px;
+      padding: 18px;
+      align-items: start;
+    }
+
+    .layer-index strong {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .layer-index span {
+      font-size: 38px;
+      letter-spacing: -0.05em;
+      line-height: 0.9;
+    }
+
+    .layer-copy h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .layer-copy p {
+      margin: 0 0 12px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .layer-meta {
+      display: grid;
+      gap: 10px;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+    }
+
+    .meta-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .meta-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .meta-box span,
+    .meta-box ul {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .note-list,
+    .check-list {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      display: grid;
+      gap: 8px;
+    }
+
+    .callout.strong {
+      background: linear-gradient(135deg, rgba(29, 91, 99, 0.12), rgba(251, 248, 243, 0.9));
+    }
+
+    .footer {
+      margin-top: 30px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer strong {
+      color: var(--ink);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 1080px) {
+      .masthead,
+      .grid-2,
+      .grid-3,
+      .layer {
+        grid-template-columns: 1fr;
+      }
+
+      .layer-meta {
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .topbar,
+      .section-header,
+      .footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-note,
+      .signal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .overview,
+      .subsection,
+      .callout {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">BS</div>
+        <div class="brand-copy">
+          <strong>Bio Studio 中文设计评估页</strong>
+          <span>把英文 spec 改写成中文可读版，方便直接浏览</span>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Page sections">
+        <a href="#overview">总览</a>
+        <a href="#status">现状判断</a>
+        <a href="#spine">平台主干</a>
+        <a href="#gaps">核心缺口</a>
+        <a href="#roadmap">前三步</a>
+        <a href="#gold-path">金路径</a>
+        <a href="#reality">现实边界</a>
+      </nav>
+    </header>
+
+    <section class="masthead" id="overview">
+      <article class="hero panel">
+        <div class="eyeline">
+          <div class="token"><strong>定位</strong><span>本地优先</span></div>
+          <div class="token"><strong>本体</strong><span>通用 AI 生物工作区</span></div>
+          <div class="token"><strong>策略</strong><span>先打透一条金路径</span></div>
+        </div>
+        <h1>先把平台主线立起来</h1>
+        <p>
+          这套仓库已经不是散装脚本集合了，但它还不是一个真正可打透的 AI 生物设计平台。
+          最合理的下一步不是继续堆工具，而是让 AI 能把自然语言目标稳定地落成一个
+          <code>project</code>，自动选策略、生成多候选、做代理评估并留下可复盘结果。
+        </p>
+        <div class="hero-note">
+          <div>
+            <strong>平台不该绑死在酵母</strong>
+            <span>酵母只应该是参考 profile，不是平台本体。</span>
+          </div>
+          <div>
+            <strong>第一阶段目标</strong>
+            <span>做出可信的代理设计闭环，不是直接宣称真实研发闭环。</span>
+          </div>
+          <div>
+            <strong>主线缺失</strong>
+            <span>现在缺的是任务解释、profile 选择、候选账本和标准落盘。</span>
+          </div>
+        </div>
+      </article>
+
+      <aside class="overview panel">
+        <div>
+          <h2>一句话判断</h2>
+          <p>底座已经像个平台了，但你真正想证明它能干活的那条设计金路径，还没有被打透。</p>
+        </div>
+        <div class="signal-grid">
+          <div class="signal">
+            <strong>70 / 100</strong>
+            <span>通用 AI 生物工作区底座成熟度</span>
+          </div>
+          <div class="signal">
+            <strong>20-30 / 100</strong>
+            <span>可打透的 AI 设计闭环成熟度</span>
+          </div>
+        </div>
+        <div class="legend">
+          <div><b>已经有</b><span>统一 CLI、MCP、shared runtime、外部引擎桥接、稳定测试</span></div>
+          <div><b>还缺</b><span>任务解释、profile contract、候选账本、评估排序、标准 project 产物</span></div>
+          <div><b>推荐方向</b><span>保留平台通用性，用一个参考 profile 证明主线可工作</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="status">
+      <div class="section-header">
+        <div class="copy">
+          <div class="kicker">Section 01</div>
+          <h2>现状判断</h2>
+          <p>先把“平台底座”和“设计闭环”分开看，不然很容易高估当前阶段。</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <article class="subsection">
+          <h3>已经成立的部分</h3>
+          <ul class="check-list">
+            <li>有工作区级入口 <code>scripts/project.py</code>。</li>
+            <li>有 <code>projects/</code> 作为任务实例层。</li>
+            <li>有 5 个 MCP server，能力面已经铺开。</li>
+            <li>有 shared runtime 和 LiteFold bridge 这种平台化思路。</li>
+            <li>稳定测试链已经跑通，最近本地结果是 <code>86 passed</code>。</li>
+          </ul>
+        </article>
+        <article class="subsection">
+          <h3>还没成立的部分</h3>
+          <ul class="check-list">
+            <li>还没有从自然语言目标一路走到 project 产物的主线。</li>
+            <li><code>bio-design</code> 现在更像点状工具封装，不是自动决策路径。</li>
+            <li>设计层的 profile 还没有真正站稳，特别是宿主/构建策略这一层。</li>
+            <li>还没有统一候选管理、排序与证据记录机制。</li>
+          </ul>
+        </article>
+      </div>
+      <div class="callout strong" style="margin-top: 16px;">
+        <h3>最关键的结论</h3>
+        <p>
+          你现在缺的不是“再多几个工具”，而是把
+          <code>任务解释 -> profile 选择 -> 候选生成 -> 评估排序 -> 项目落盘</code>
+          这根主线立起来。
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="spine">
+      <div class="section-header">
+        <div class="copy">
+          <div class="kicker">Section 02</div>
+          <h2>平台主干结构</h2>
+          <p>平台保持通用，具体生物学差异下沉到 profile。先把骨架固定，后面才能扩展多任务。</p>
+        </div>
+      </div>
+      <div class="layer-stack">
+        <article class="layer">
+          <div class="layer-index"><strong>Layer</strong><span>01</span></div>
+          <div class="layer-copy">
+            <h3>Task Interpreter</h3>
+            <p>把自然语言目标转成结构化任务书，至少要明确任务类型、分子对象、候选宿主、输出粒度、联网策略、成功标准和风险偏好。</p>
+            <div class="chip-row">
+              <span class="chip">task_type</span>
+              <span class="chip">molecule_type</span>
+              <span class="chip">candidate_hosts</span>
+              <span class="chip">success_criteria</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>作用</strong>
+              <span>把模糊目标变成可复现的任务输入。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer">
+          <div class="layer-index"><strong>Layer</strong><span>02</span></div>
+          <div class="layer-copy">
+            <h3>Profile Registry</h3>
+            <p>平台本身不绑死在酵母、E.coli 或某个任务上，差异全部进入 profile，例如表达宿主、分子类型、评分逻辑与依赖资产。</p>
+            <div class="chip-row">
+              <span class="chip">yeast_expression</span>
+              <span class="chip">ecoli_expression</span>
+              <span class="chip">peptide_design</span>
+              <span class="chip">rnaseq_analysis</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>作用</strong>
+              <span>让平台保持通用，让专业逻辑可插拔。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer">
+          <div class="layer-index"><strong>Layer</strong><span>03</span></div>
+          <div class="layer-copy">
+            <h3>Orchestrator</h3>
+            <p>真正的 AI 主线。它负责读取任务书、选择 profile、创建 project、安排阶段执行、调用 MCP 和脚本、在失败时留下结构化原因。</p>
+            <div class="chip-row">
+              <span class="chip">project creation</span>
+              <span class="chip">tool routing</span>
+              <span class="chip">retry / fail</span>
+              <span class="chip">provenance</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>现状</strong>
+              <span><code>scripts/project.py</code> 是好入口，但它还不是 agent 编排器。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer">
+          <div class="layer-index"><strong>Layer</strong><span>04</span></div>
+          <div class="layer-copy">
+            <h3>Candidate + Evaluation Ledger</h3>
+            <p>平台不该只产出一个拍脑袋答案，而是要管理多候选、评分拆解、证据链接、风险说明和不确定性。</p>
+            <div class="chip-row">
+              <span class="chip">multiple candidates</span>
+              <span class="chip">scoring</span>
+              <span class="chip">evidence</span>
+              <span class="chip">risk notes</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>作用</strong>
+              <span>把“会生成”升级成“会做设计决策”。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="layer">
+          <div class="layer-index"><strong>Layer</strong><span>05</span></div>
+          <div class="layer-copy">
+            <h3>Project Materializer</h3>
+            <p>每次运行都要把全过程沉淀到 <code>projects/</code>，而不是只停留在聊天窗口里。</p>
+            <div class="chip-row">
+              <span class="chip">design_brief.json</span>
+              <span class="chip">profile_decision.json</span>
+              <span class="chip">candidate_table.csv</span>
+              <span class="chip">evaluation_report.md</span>
+            </div>
+          </div>
+          <div class="layer-meta">
+            <div class="meta-box">
+              <strong>作用</strong>
+              <span>让每次任务可复盘、可比较、可继续开发。</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="gaps">
+      <div class="section-header">
+        <div class="copy">
+          <div class="kicker">Section 03</div>
+          <h2>当前缺口与优先级</h2>
+          <p>真正阻碍你前进的不是“少几个工具”，而是中间决策层和数据落盘层没有统一模型。</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <article class="subsection">
+          <h3>最缺的 5 块</h3>
+          <ul class="note-list">
+            <li>统一任务书 schema</li>
+            <li>profile contract</li>
+            <li>真正的 orchestrator</li>
+            <li>candidate ledger + ranking layer</li>
+            <li>标准 project 产物模型</li>
+          </ul>
+        </article>
+        <article class="subsection">
+          <h3>为什么不是继续加工具</h3>
+          <ul class="note-list">
+            <li>工具越多，没有主线时只会更散。</li>
+            <li>每次都靠 prompt 临场发挥，结果不可复现。</li>
+            <li>没有候选账本，就永远是“给答案”，不是“做决策”。</li>
+          </ul>
+        </article>
+      </div>
+      <div class="bars">
+        <div class="bar">
+          <div class="bar-head"><span>任务书与输出模型</span><span>P0</span></div>
+          <div class="track"><div class="fill" style="width: 96%;"></div></div>
+        </div>
+        <div class="bar">
+          <div class="bar-head"><span>profile contract</span><span>P1</span></div>
+          <div class="track"><div class="fill teal" style="width: 88%;"></div></div>
+        </div>
+        <div class="bar">
+          <div class="bar-head"><span>参考 profile 打透</span><span>P2</span></div>
+          <div class="track"><div class="fill olive" style="width: 78%;"></div></div>
+        </div>
+        <div class="bar">
+          <div class="bar-head"><span>候选管理与评估排序</span><span>P3</span></div>
+          <div class="track"><div class="fill" style="width: 74%;"></div></div>
+        </div>
+        <div class="bar">
+          <div class="bar-head"><span>标准化项目落盘</span><span>P4</span></div>
+          <div class="track"><div class="fill gold" style="width: 66%;"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="roadmap">
+      <div class="section-header">
+        <div class="copy">
+          <div class="kicker">Section 04</div>
+          <h2>前三步开发顺序</h2>
+          <p>不要先做“全自动大脑”，先把输入输出和 contract 固定，再去打通主线。</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        <article class="subsection">
+          <h3>第一步</h3>
+          <p>先定义任务书 schema 和标准产物，比如 <code>design_brief.json</code>、<code>run_manifest.json</code>、<code>candidate_table.csv</code>。</p>
+        </article>
+        <article class="subsection">
+          <h3>第二步</h3>
+          <p>定义 profile contract，不要先做很多 profile。先让“平台通用、profile 专用”成为真实代码边界。</p>
+        </article>
+        <article class="subsection">
+          <h3>第三步</h3>
+          <p>只打透一条参考金路径，让 orchestrator 真正跑通一遍：解释任务、选 profile、生成候选、评估排序、落盘。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="gold-path">
+      <div class="section-header">
+        <div class="copy">
+          <div class="kicker">Section 05</div>
+          <h2>最小可行金路径</h2>
+          <p>平台不需要一开始支持所有生物任务，但必须有一条能证明自己不是空壳的纵向样板。</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <article class="subsection">
+          <h3>用户看到的路径</h3>
+          <ul class="note-list">
+            <li>输入一句自然语言目标</li>
+            <li>AI 自动创建一个 design project</li>
+            <li>自动解释任务并选 profile</li>
+            <li>生成多个候选方案</li>
+            <li>输出 CDS / mRNA / construct 草案</li>
+            <li>做代理评估与排序</li>
+            <li>把全过程落盘到 <code>projects/</code></li>
+          </ul>
+        </article>
+        <article class="subsection">
+          <h3>系统内部更合理的方式</h3>
+          <p>
+            就算对外输出是 DNA 或表达构建，内部也不应该一开始就在裸 DNA 空间里瞎搜。
+            更可信的方式是：
+          </p>
+          <p style="margin-top: 12px;">
+            <code>功能意图 -> 分子候选 -> 反推成 DNA / mRNA / construct 草案</code>
+          </p>
+          <p style="margin-top: 12px;">
+            也就是：输出粒度可以在 DNA 层，但内部优化层最好还是先站在功能和分子层。
+          </p>
+        </article>
+      </div>
+      <div class="callout" style="margin-top: 16px;">
+        <h3>金路径成功的标志</h3>
+        <ul class="note-list">
+          <li>同类自然语言任务能稳定落成结构化任务书</li>
+          <li>系统能自动建 project 并记录 profile 选择原因</li>
+          <li>系统输出多个候选，而不是单答案</li>
+          <li>每个候选都有构建草案、评分拆解、风险和不确定性</li>
+          <li>失败时能明确说自己卡在哪一层</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="reality">
+      <div class="section-header">
+        <div class="copy">
+          <div class="kicker">Section 06</div>
+          <h2>现实边界</h2>
+          <p>你这台机器能做出一个很像样的本地原型，但第一阶段别把代理评估吹成真实研发闭环。</p>
+        </div>
+      </div>
+      <div class="grid-2">
+        <article class="subsection">
+          <h3>现在现实能做的</h3>
+          <ul class="note-list">
+            <li>自然语言任务解释</li>
+            <li>自动 project 创建与编排</li>
+            <li>联网查数据库、文献、模板信息</li>
+            <li>生成 DNA / CDS / mRNA / 构建设计草案</li>
+            <li>做中小规模结构或代理评估</li>
+            <li>输出多候选排序与报告</li>
+          </ul>
+        </article>
+        <article class="subsection">
+          <h3>短期别高估的部分</h3>
+          <ul class="note-list">
+            <li>不要把功能预测当真值</li>
+            <li>不要做超大规模候选搜索</li>
+            <li>不要一开始承诺真实湿实验成功</li>
+            <li>不要把第一阶段包装成“自动研发闭环平台”</li>
+          </ul>
+        </article>
+      </div>
+      <div class="callout strong" style="margin-top: 16px;">
+        <h3>最准确的第一阶段说法</h3>
+        <p>
+          <strong>本地优先的 AI 辅助生物设计与代理评估工作区</strong>，
+          而不是已经完成真实验证的全自动生物研发平台。
+        </p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <strong>文件来源</strong>
+        <span>中文页基于已确认的设计 spec 改写，用于网页阅读，不替代原始文档。</span>
+      </div>
+      <div>
+        <strong>原始 spec</strong>
+        <span><a href="../superpowers/specs/2026-03-26-local-ai-bio-workspace-gold-path-design.md">查看 Markdown 原文</a></span>
+      </div>
+      <div>
+        <strong>返回入口</strong>
+        <span><a href="./index.html">Bio Studio 介绍页</a></span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
