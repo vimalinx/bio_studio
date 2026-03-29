@@ -46,6 +46,8 @@ build/
 *.tmp
 *.log
 .DS_Store
+scripts/skills/config.local.json
+scripts/skills/.env
 projects/*/logs/validation_report.json
 projects/*/logs/validation_report.md
 

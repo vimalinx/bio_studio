@@ -18,23 +18,27 @@ def test_special_projects_are_classified_in_readme() -> None:
     specialist_readme = (
         ROOT / "projects" / "test_rnaseq_analysis" / "README.md"
     ).read_text(encoding="utf-8")
+    benchmark_readme = (
+        ROOT / "projects" / "cross_system_benchmark" / "README.md"
+    ).read_text(encoding="utf-8")
     learning_readme = (
         ROOT / "projects" / "yeast_genome_learning" / "README.md"
     ).read_text(encoding="utf-8")
 
     assert "专项项目" in specialist_readme
+    assert "专项项目" in benchmark_readme
     assert "学习项目" in learning_readme
 
 
 def test_special_projects_have_validation_entrypoints() -> None:
-    for project_name in ("test_rnaseq_analysis", "yeast_genome_learning"):
+    for project_name in ("test_rnaseq_analysis", "cross_system_benchmark", "yeast_genome_learning"):
         _, scripts_dir = _project_paths(project_name)
         assert (scripts_dir / "validate_project.py").exists(), project_name
         assert (scripts_dir / "pipeline.py").exists(), project_name
 
 
 def test_special_projects_pipeline_validate_runs_and_writes_report() -> None:
-    for project_name in ("test_rnaseq_analysis", "yeast_genome_learning"):
+    for project_name in ("test_rnaseq_analysis", "cross_system_benchmark", "yeast_genome_learning"):
         project_root, scripts_dir = _project_paths(project_name)
 
         result = subprocess.run(
@@ -51,7 +55,7 @@ def test_special_projects_pipeline_validate_runs_and_writes_report() -> None:
 
 
 def test_special_projects_pipeline_steps_runs() -> None:
-    for project_name in ("test_rnaseq_analysis", "yeast_genome_learning"):
+    for project_name in ("test_rnaseq_analysis", "cross_system_benchmark", "yeast_genome_learning"):
         _, scripts_dir = _project_paths(project_name)
 
         result = subprocess.run(

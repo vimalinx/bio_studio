@@ -1,0 +1,4 @@
+dataset	comparison	group_a	group_b	note
+ebola	ebov_timecourse	EBOV_D1	EBOV_D3	viral expression shift across day 1-3
+sars_cov_2	nhbe_mock_vs_sars	mock	infected	NHBE mock versus SARS-CoV-2 infected samples
+yeast	wt_log_vs_q	log_phase	quiescence	wild-type log phase versus quiescence

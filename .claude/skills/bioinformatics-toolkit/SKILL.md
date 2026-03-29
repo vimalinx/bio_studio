@@ -1,205 +1,61 @@
 ---
 name: bioinformatics-toolkit
-description: Execute bioinformatics analysis including sequence alignment (BLAST, bowtie2, bwa), NGS data processing (samtools, bcftools), variant calling, gene prediction (prodigal), RNA structure analysis (ViennaRNA), and Python-based genomics workflows (Biopython). Automatically triggered when working with sequencing data, genome analysis, molecular biology data, or using bioinformatics tools.
+description: Use when you need a workspace-level entry point to choose among the installed bioinformatics CLIs and repo-backed AI/bio projects in this environment.
 allowed-tools: Bash, Read, Write, Grep, Glob, Edit
 user-invocable: true
 ---
 
-# Bioinformatics Toolkit
+# bioinformatics-toolkit
 
-Comprehensive toolkit for molecular biology and genomics analysis. This Skill provides command-line tools and best practices for common bioinformatics workflows.
+Top-level workspace gateway for bioinformatics work. In this environment, the most reliable local assets are the `bio` conda env CLIs (`blast*`, `bowtie2`, `bwa`, `samtools`, `bcftools`, `prodigal`, `RNAfold`, `iqtree`, `hmmscan`, `mafft`, `muscle`, `hisat2`, `featureCounts`, `seqkit`) plus several repo-backed projects under `repositories/active/` such as `Biomni`, `evo2`, and `RFdiffusion`.
 
-## Quick Reference
+## Quick Start
 
-### Sequence Analysis
-- **BLAST** (`blastn`): Nucleotide sequence alignment and similarity search
-- **HMMER** (`hmmer`): Protein sequence profile searches
-- **Biopython**: Python library for sequence manipulation
+- **Activate environment:** `conda activate bio`
+- **Verified local CLI families:** BLAST, Bowtie2, BWA, Samtools, Bcftools, HMMER, MAFFT, MUSCLE, Prodigal, ViennaRNA, IQ-TREE, SeqKit
+- **Repo-backed projects:** `/home/vimalinx/Projects/bio_studio/repositories/active/Biomni`, `/home/vimalinx/Projects/bio_studio/repositories/active/evo2`, `/home/vimalinx/Projects/bio_studio/repositories/active/RFdiffusion`
 
-### Alignment & Mapping
-- **bowtie2**: Fast and sensitive read alignment
-- **bwa**: Burrows-Wheeler aligner for Illumina reads
-- **samtools**: SAM/BAM file processing and analysis
+## When To Use This Tool
 
-### Genome Analysis
-- **prodigal**: Prokaryotic gene prediction
-- **ViennaRNA**: RNA secondary structure prediction
-- **bcftools**: Variant calling and VCF file processing
-- **bedtools**: Genome arithmetic toolkit
+- Figuring out which local tool family or project should handle a bioinformatics request
+- Starting from a workspace-wide inventory instead of guessing what is installed
+- Routing between plain CLIs, teaching projects, and heavier repo-backed AI workflows
+- Auditing whether a proposed method matches the actual assets in this workspace
 
-### Quality Control
-- **fastp**: All-in-one FASTQ preprocessor (QC + Trimming)
-- **FastQC**: Classic quality control tool
-- **MultiQC**: Aggregate results from bioinformatics analyses
-
-### Phylogenetics
-- **iqtree**: Efficient phylogenomic inference (v3.x)
-
-### AI-Powered Analysis
-- **Biomni**: Specialized biological agents and tools (ORF finding, restriction sites, protocol design)
-- **Evo 2**: Genomic foundation model for zero-shot variant effect prediction and sequence generation
-
-## Environment Setup
-
-Always use conda environments for bioinformatics tools:
+## Common Patterns
 
 ```bash
-# Activate bio environment (has torch and bio packages)
-conda activate bio
-
-# Or use base environment for system tools
-# System has: blastn, bowtie2, bwa, samtools
+# Check the core local CLI toolchain
+command -v blastn bowtie2 bwa samtools bcftools prodigal RNAfold iqtree
 ```
 
-## Common Workflows
-
-### 1. BLAST Sequence Search
-
 ```bash
-# Basic nucleotide BLAST
-blastn -query input.fasta -db nt -out results.txt -outfmt 6
-
-# With parameters
-blastn -query sequence.fasta -db nt \
-  -evalue 1e-10 -num_threads 4 \
-  -out blast_results.txt -outfmt 6
-```
-
-### 2. Read Alignment with bowtie2
-
-```bash
-# Build index
-bowtie2-build reference.fasta ref_index
-
-# Align reads
+# Start a classic alignment + BAM-processing workflow
 bowtie2 -x ref_index -U reads.fq -S aligned.sam
-
-# Convert to BAM and sort
-samtools view -bS aligned.sam | samtools sort -o aligned_sorted.bam
-samtools index aligned_sorted.bam
+samtools view -bS aligned.sam | samtools sort -o aligned.sorted.bam
 ```
-
-### 3. BAM File Processing
 
 ```bash
-# View alignment statistics
-samtools flagstat aligned.bam
-samtools idxstats aligned.bam
-
-# Extract mapped reads
-samtools view -b -F 4 aligned.bam > mapped.bam
-
-# Get coverage
-samtools depth aligned.bam > coverage.txt
+# Start an RNA structure or phylogeny workflow
+RNAfold < sequences.fa
+iqtree -s alignment.fa
 ```
-
-### 4. Gene Prediction with Prodigal
 
 ```bash
-# Predict protein-coding genes
-prodigal -i genome.fasta -a proteins.faa -d genes.fna \
-  -f gff -o genes.gff -p single
+# Inspect repo-backed bio projects
+ls /home/vimalinx/Projects/bio_studio/repositories/active
 ```
 
-### 5. RNA Secondary Structure (ViennaRNA)
+## Recommended Workflow
 
-```bash
-# Predict minimum free energy structure
-RNAfold < sequence.fasta
+1. Begin with the verified CLI inventory in the `bio` environment.
+2. Route the task to a narrower skill whenever the job has a clear domain: sequence analysis, protein structure/design, yeast learning project, Biomni, Evo 2, or RFdiffusion.
+3. Use repo-backed projects only after confirming their extra dependencies are satisfied.
+4. Keep the umbrella skill focused on tool selection and environment reality checks, not on pretending every downstream project is already turnkey.
 
-# Calculate base pairing probabilities
-RNAplfold < sequence.fasta
-```
+## Guardrails
 
-## Python with Biopython
-
-```python
-from Bio import SeqIO
-from Bio.Blast import NCBIWWW
-
-# Read sequences
-for record in SeqIO.parse("input.fasta", "fasta"):
-    print(f"{record.id}: {len(record.seq)} bp")
-
-# Online BLAST
-result = NCBIWWW.qblast("blastn", "nt", sequence)
-```
-
-## Python with Biomni (No API Key Required)
-
-Biomni provides specialized tools that can be imported directly:
-
-```python
-import sys
-import subprocess
-from pathlib import Path
-
-# Locate Bio Studio root
-root = subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip()
-sys.path.append(str(Path(root) / "repositories/active/Biomni"))
-
-from biomni.tool.molecular_biology import annotate_open_reading_frames, find_restriction_sites
-
-# Find ORFs
-orfs = annotate_open_reading_frames(sequence, min_length=300)
-
-# Find Restriction Sites
-sites = find_restriction_sites(sequence, ["EcoRI", "BamHI"])
-```
-
-## Deep Learning with Evo 2 (Docker)
-
-For advanced variant effect prediction:
-
-```bash
-# Start Evo 2 container
-docker compose -f repositories/active/evo2/docker-compose.override.yml run --rm -d --name evo2-analysis evo2 sleep infinity
-
-# Run analysis script
-docker exec evo2-analysis python3 /workdir/projects/my_project/scripts/evo2_analysis.py
-```
-
-## Best Practices
-
-1. **Always check tool versions**: `tool --version` or `conda list tool-name`
-2. **Use appropriate output formats**: `-outfmt 6` for BLAST (tabular), BAM for alignments
-3. **Parallel processing**: Use `-num_threads` or `-t` for multi-core tools
-4. **File compression**: Use `.gz` for large files, pipe with `gzip`
-5. **Verify results**: Check output files, use `samtools quickcheck` for BAM files
-
-## Additional Resources
-
-- For detailed tool usage, see [TOOLS.md](TOOLS.md)
-- For complete analysis workflows, see [WORKFLOWS.md](WORKFLOWS.md)
-- Utility scripts are in the `scripts/` directory
-
-## Troubleshooting
-
-### Tool not found
-- Check conda environment: `conda list | grep tool-name`
-- Switch to bio environment: `conda activate bio`
-
-### File format issues
-- Validate FASTA: Check for proper headers and sequence lines
-- Check SAM/BAM: `samtools quickcheck file.bam`
-- Convert formats: Use `samtools view` or Biopython
-
-### Memory errors
-- Reduce threads: `-num_threads 2`
-- Process in chunks: Split input files
-- Use streaming: Pipe commands instead of intermediate files
-
----
-
-## Getting Help
-
-For each tool, check built-in help:
-```bash
-tool --help
-man tool  # for detailed manual
-```
-
-For complex analyses, Claude can also invoke specialized Skills:
-- `sequence-analysis`: Advanced sequence operations
-- `rnaseq-pipeline`: Complete RNA-seq workflows
-- `protein-structure`: Protein 3D structure prediction
+- The reliable base layer here is the installed CLI toolchain in the `bio` environment.
+- Repo-backed projects like Biomni, Evo 2, and RFdiffusion are present locally but each has additional setup gaps or missing dependencies.
+- Do not advertise absent tools just because earlier autogenerated docs mentioned them. Limit recommendations to commands or repos that are actually present.
+- When in doubt, prefer the narrower skill that matches the concrete subtask.

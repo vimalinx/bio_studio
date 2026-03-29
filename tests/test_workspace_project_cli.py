@@ -97,29 +97,35 @@ def test_project_cli_workspace_validate_targets_workspace_smoke_test() -> None:
 
 
 def test_project_cli_validate_runs_special_project_validation() -> None:
-    result = subprocess.run(
-        [sys.executable, str(CLI), "validate", "test_rnaseq_analysis"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    for project_name in ("test_rnaseq_analysis", "cross_system_benchmark"):
+        result = subprocess.run(
+            [sys.executable, str(CLI), "validate", project_name],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
 
-    assert "Validation summary: PASS" in result.stdout
-    assert "validation_report.json" in result.stdout
+        assert "Validation summary: PASS" in result.stdout
+        assert "validation_report.json" in result.stdout
 
 
 def test_project_cli_steps_lists_special_project_steps() -> None:
-    result = subprocess.run(
-        [sys.executable, str(CLI), "steps", "test_rnaseq_analysis"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    expected_tokens = {
+        "test_rnaseq_analysis": ("data_preparation", "quality_control"),
+        "cross_system_benchmark": ("fetch", "report"),
+    }
+    for project_name, tokens in expected_tokens.items():
+        result = subprocess.run(
+            [sys.executable, str(CLI), "steps", project_name],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
 
-    assert "data_preparation" in result.stdout
-    assert "quality_control" in result.stdout
+        for token in tokens:
+            assert token in result.stdout
 
 
 def test_project_cli_run_learning_project_prints_workspace_level_guidance() -> None:

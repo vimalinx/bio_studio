@@ -11,6 +11,8 @@
 - `docs/BEST_PRACTICES.md`：踩坑与经验总结
 - `docs/ENVIRONMENT.md`：环境快照（由脚本生成）
 - `docs/CHANGELOG.md`：变更记录
+- `docs/superpowers/specs/2026-03-29-online-api-control-plane-design.md`：在线 API 控制面设计
+- `docs/superpowers/plans/2026-03-29-online-api-control-plane-phase-1.md`：在线 API 第一阶段实施计划
 
 补充：如果你想理解 `scripts/project.py run <项目名>` 为什么在不同项目上表现不同，先看 `README.md` 的“项目类型与统一入口语义”，再看 `docs/WORKSPACE_ARCHITECTURE.md` 的项目分类说明。
 
@@ -24,6 +26,7 @@
 - `docs/bioinformatics_skills_summary.md`：工具与技能触发概览
 - `docs/skills_create.md`：自定义技能说明
 - `docs/plans/2026-03-23-workspace-governance-design.md`：本轮工作区治理设计记录
+- `docs/superpowers/specs/2026-03-26-local-ai-bio-workspace-gold-path-design.md`：本地优先生物编排主线设计
 
 ## 📦 共享数据
 - `shared_data/README.md`：共享数据说明与目录约定

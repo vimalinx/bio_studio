@@ -1,0 +1,138 @@
+# Progress Log
+
+## 2026-03-28
+
+- Standardized and structurally validated 4 more local-archive helper skills: `xcommon-sh`, `xfetch`, `xfilter`, and `xinfo`.
+- Captured several important local-vs-remote corrections in that batch, especially `xcommon.sh` being a shared shell library rather than a real CLI, `xfetch` fetching from a configured local archive instead of remote EFetch, `xfilter` querying local postings through `rchive -query`, and `xinfo` listing local postings fields/counts rather than calling remote `einfo`.
+- Structural backlog is now down to 20 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 364 manually standardized skills.
+- Standardized and structurally validated 4 more diagnostic/text-helper skills: `test-pcre`, `test-pmc-index`, `test-pubmed-index`, and `word-at-a-time`.
+- Captured several high-value corrections in that batch, especially that the real regex test binary is `test_pcre` rather than `test-pcre`, that both local archive smoke tests (`test-pmc-index`, `test-pubmed-index`) have no safe help/version path and will misfire noisily without `EDIRECT_LOCAL_ARCHIVE`, and that `word-at-a-time` is simply a lowercase alphanumeric tokenizer.
+- Structural backlog is now down to 24 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 360 manually standardized skills.
+- Standardized and structurally validated 4 more SPDI / diagnostic wrapper skills: `spdi2tbl`, `tbl2prod`, `test-edirect`, and `test-eutils`.
+- Captured several strong semantic corrections in that batch, especially `spdi2tbl` flattening `<SPDI>` XML rather than arbitrary SPDI text, `tbl2prod` actually consuming `spdi2tbl`-style 8-column variant rows to emit reference/altered product sequences, `test-edirect` being a long-form live example suite rather than a terse pass/fail checker, and `test-eutils` using progress dots / `x` markers for endpoint health checks.
+- Structural backlog is now down to 32 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 356 manually standardized skills.
+- Standardized and structurally validated 4 more line-sorting helper skills: `sort-by-length`, `sort-table`, `sort-uniq-count`, and `sort-uniq-count-rank`.
+- Captured several important semantic corrections in that batch, especially `sort-by-length` operating on plain text lines rather than FASTA records, `sort-table` being just `grep '.' | sort -t '\t'`, `sort-uniq-count` sorting internally instead of requiring pre-sorted input, and `sort-uniq-count-rank` always ranking by descending count after case-insensitive grouping.
+- Structural backlog is now down to 36 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 352 manually standardized skills.
+- Standardized and structurally validated 4 more short-source wrapper skills: `run-roh-pl`, `skip-if-file-exists`, `snp2hgvs`, and `snp2tbl`.
+- Captured several meaningfully corrective behaviors in that batch, especially `run-roh.pl` producing per-sample `.bcf`, `.txt.gz`, and `.log` files before writing `merged.txt`, `skip-if-file-exists` being a stdin path filter rather than a command wrapper, `snp2hgvs` emitting structured `<HGVS>` XML from dbSNP docsum input, and `snp2tbl` actually being the chained pipeline `snp2hgvs | hgvs2spdi | spdi2tbl`.
+- Structural backlog is now down to 40 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 348 manually standardized skills.
+- Standardized and structurally validated 4 more lightly evidenced wrapper skills: `easel`, `plot-roh-py`, `remove-dup`, and `run-ncbi-converter`.
+- Captured several high-signal runtime and source-derived quirks in that batch, especially `easel` being blocked here by missing `libopenblas.so.0` while still exposing its dispatcher interface through binary strings, `plot-roh.py` requiring gzipped `GT` plus 8-column `RG` records instead of raw `bcftools roh` output, `removeDup` dropping every read at loci whose depth meets the cutoff rather than preserving one representative alignment, and `run-ncbi-converter` being an FTP bootstrapper with no safe local help/version path.
+- Structural backlog is now down to 44 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 344 manually standardized skills.
+- Standardized and structurally validated 10 more plotting, cache, and table-helper skills: `plot-ampliconstats`, `plot-bamstats`, `plot-vcfstats`, `propmapped`, `rchive`, `ref-cache`, `ref2pmid`, `refseq-nm-cds`, `reorder-columns`, and `repair`.
+- Captured several environment-critical behaviors in that batch, especially `plot-ampliconstats` requiring `gnuplot`, `plot-bamstats` being blocked here by missing Perl module `URI::Escape`, `plot-vcfstats -P` successfully bypassing the missing LaTeX/PDF toolchain, `propmapped` only yielding useful output with `-o`, `rchive` preferring `-version` over `--version`, `ref2pmid` being just `transmute -r2p`, `refseq-nm-cds` defaulting to human and triggering large download/process jobs, `reorder-columns` being a tab-only awk wrapper, and `repair` injecting dummy mates unless `-d` is set.
+- Structural backlog is now down to 48 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 340 manually standardized skills.
+- Standardized and structurally validated 4 additional legacy holdouts: `analyse-seqs`, `b2ct`, `md5fa`, and `md5sum-lite`.
+- Captured several non-obvious behaviors in that batch, especially `AnalyseSeqs` requiring stdin-terminated sequence blocks plus optional taxa-prefixed PostScript output, `b2ct` only having a confirmed stdin-to-stdout conversion path, `md5fa` emitting per-record plus `>ordered` / `>unordered` digests, and `md5sum-lite` behaving like a stripped-down HTSlib `md5sum` with stdin labeled as `-`.
+- Structural backlog is now down to 48 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 340 manually standardized skills.
+- Standardized and structurally validated the final 2 BLAST-related outliers still missing the five-section house style: `blast2sam-pl` and `tblastn-vdb`.
+- Corrected `tblastn_vdb` supporting reference capture to match the live binary's single-dash `-help` and `-version` behavior instead of stale autogenerated GNU-style guesses.
+- Added source-derived option semantics for `blast2sam.pl`, including the real meanings of `-s` and `-d`.
+- Closed out the current BLAST cleanup batch at `REMAINING 0` for the two residual nonstandard skills in that family.
+- Standardized and structurally validated 9 additional legacy SAM conversion helpers: `ace2sam`, `bowtie2sam-pl`, `export2sam-pl`, `maq2sam-long`, `maq2sam-short`, `novo2sam-pl`, `psl2sam-pl`, `soap2sam-pl`, and `zoom2sam-pl`.
+- Standardized and structurally validated the remaining 2 true SAM-adjacent holdouts in that scan line: `interpolate-sam-pl` and `sam2vcf-pl`.
+- Standardized the final non-SAM name-collision outlier caught by the same scan: `disambiguate-nucleotides`.
+- Cleared the current `*sam*` structural scan to `REMAINING 0`.
+- Standardized and structurally validated 19 RNA / kinetics skills: `rna2-dfold`, `rnaaliduplex`, `rnaalifold`, `rnacofold`, `rnaconsensus`, `rnadistance`, `rnaforester`, `rnaheat`, `rnainverse`, `rnalalifold`, `rnalfold`, `rnalocmin`, `rnamultifold`, `rnapaln`, `rnaplot`, `rnapvmin`, `kinfold`, `kinwalker`, and `rnaseq-pipeline`.
+- Cleared both current `rna*` and `kin*` structural scans to `REMAINING 0`.
+- Verified or captured key runtime quirks for this batch, especially `RNAconsensus --version` failure, `kinwalker --version` fallback to usage, and the `RNApvmin` startup failure caused by missing `libopenblas.so.0`.
+- Standardized and structurally validated 7 EDirect archive-wrapper skills: `archive-nihocc`, `archive-nlmnlp`, `archive-nmcds`, `archive-pids`, `archive-pmc`, `archive-pubmed`, and `archive-taxonomy`.
+- Standardized and structurally validated 4 EDirect UID-list helpers: `combine-uid-lists`, `difference-uid-lists`, `exclude-uid-lists`, and `intersect-uid-lists`.
+- Corrected several stale autogenerated assumptions in that batch, especially that the archive wrappers have safe `--help` / `--version` output and that the UID-list tools require pre-sorted input or expose clean custom help.
+- Closed the current `archive-*` and UID-list EDirect scans to `REMAINING 0`.
+- Standardized and structurally validated 15 EDirect XML / JSON converter skills: `asn2xml`, `csv2xml`, `fsa2xml`, `gbf2xml`, `gff2xml`, `ini2xml`, `json2xml`, `jsonl2xml`, `scn2xml`, `tbl2xml`, `toml2xml`, `yaml2xml`, `xml2fsa`, `xml2json`, and `xml2tbl`.
+- Corrected converter-specific quirks in that batch, especially the hidden `transmute` / `xtract` PATH dependency, `json2xml` turning `--help` / `--version` into literal XML, `jsonl2xml` emitting multi-root output, and `xml2json` failing on the missing `XML::Simple.pm` dependency.
+- Closed the current XML / JSON converter scan to `REMAINING 0`.
+- Standardized and structurally validated 10 additional helper skills across VCF, text filtering, and GTF extraction: `fill-aa`, `fill-an-ac`, `fill-fs`, `fill-ref-md5`, `filter-columns`, `filter-genbank`, `filter-record`, `filter-stop-words`, `extract-exons-py`, and `extract-splice-sites-py`.
+- Captured several real behavior quirks in that batch, especially `fill-an-ac`'s diploid-only AC/AN recalculation, `fill-fs` only using the first ALT allele plus command-order-sensitive mask settings, and the HISAT2 extractor scripts merging exon gaps of 5 bp or less before output.
+- Closed the current `fill-*`, `filter-*`, and `extract-*-py` scans to `REMAINING 0`.
+- Standardized and structurally validated 5 GenBank flatfile helper skills: `gbf2facds`, `gbf2fsa`, `gbf2info`, `gbf2ref`, and `gbf2tbl`.
+- Captured the real pipeline composition in that batch, especially that `gbf2fsa` and `gbf2tbl` are composed wrappers, while `gbf2facds` exposes distinct nucleotide/protein CDS modes and `gbf2info` emits structured `GenBankInfo` XML.
+- Closed the current `gbf2*` scan to `REMAINING 0`.
+- Standardized and structurally validated 7 additional GFF / interval helper skills: `gff-sort`, `gff2gff`, `gff2gff-py`, `flatten-gtf`, `fuse-ranges`, `fuse-segments`, and `find-in-gene`.
+- Captured several runtime and source-level quirks in that batch, especially `gff-sort`'s hidden EDirect PATH dependency plus comment stripping, `gff2gff`'s stderr repair summaries, `gff2gff.py`'s missing `gffutils` dependency and scratch-DB positional argument, `flattenGTF`'s nonstandard help/version behavior, the bogus `0 0 1` empty-input sentinel in both `fuse-*` wrappers, and `find-in-gene` actually requiring `strand min max`.
+- Standardized and structurally validated 8 additional EDirect text / interval helpers: `accn-at-a-time`, `align-columns`, `args2slice`, `between-two-genes`, `expand-current`, `gene2range`, `join-into-groups-of`, and `just-top-hits`.
+- Captured several deceptive-name and wrapper quirks in that batch, especially `accn-at-a-time` being only a tokenizer, `align-columns` depending on `transmute`, `expand-current` doing destructive rebuild work while still exiting `0` in a broken environment, and `just-top-hits` counting first-column groups instead of scoring rows.
+- Standardized and structurally validated 4 more citation / annotation helpers: `amino-acid-composition`, `annot-tsv`, `asn2ref`, and `cit2pmid`.
+- Corrected several autogenerated misconceptions in that batch, especially that `amino-acid-composition` handles FASTA records, that `annot-tsv -h` is help, and that `cit2pmid` supports clean help/version metadata flags.
+- Standardized and structurally validated 7 additional EDirect / operational helper wrappers: `download-ncbi-software`, `download-pmc`, `exact-snp`, `fasta-sanitize-pl`, `get-species-taxids-sh`, `gm2ranges`, and `gm2segs`.
+- Captured several non-obvious runtime quirks in that batch, especially `download-ncbi-software`'s effectively empty `sra-toolkit` Linux path, `download-pmc`'s verification-and-delete retry flow, `exactSNP`'s real `-v` version flag plus VCF output, and the exact dependency/output shape of `gm2segs`.
+- Standardized and structurally validated 5 more short-source wrapper skills: `pair-at-a-time`, `color-chrs-pl`, `pma2apa`, `pma2pme`, and `nhance-sh`.
+- Corrected several misleading autogenerated assumptions in that batch, especially that `pair-at-a-time` is a read-pair utility, that `color-chrs.pl` is a generic plotter instead of a human-karyotype SVG renderer, that `pma2apa` / `pma2pme` expose normal help flags, and that `nhance.sh` currently runs cleanly in this environment.
+- Standardized and structurally validated 5 more text-formatting and quality-helper skills: `print-columns`, `print-missing-subranges`, `quote-grouped-elements`, `qualfa2fq-pl`, and `quality-scores`.
+- Corrected several wrapper-specific gotchas in that batch, especially `print-columns` requiring single-quoted expressions, `print-missing-subranges` implicitly anchoring at `1`, `quote-grouped-elements` being only a simple sed-based formatter, `qualfa2fq.pl` silently trusting FASTA / QUAL record order, and `qualityScores` emitting per-read comma-separated vectors rather than summary statistics.
+- Standardized and structurally validated 5 more variant / docsum helpers: `guess-ploidy-py`, `hgvs2spdi`, `ds2pme`, `bsmp2info`, and `gen-random-reads`.
+- Captured several workflow-critical behaviors in that batch, especially `guess-ploidy.py`'s PNG-only plotting path, `hgvs2spdi`'s stdin-HGVS-plus-optional-transform-file contract, `ds2pme` expecting docsum rather than full PubMed XML, `bsmp2info` producing compact XML with lowercased harmonized tags, and `genRandomReads` defaulting to one million reads when `--totalReads` is omitted.
+- Standardized and structurally validated 5 more legacy binary / BLAST helpers: `ct2db`, `datatool`, `popt`, `clustalw2`, and `blst2gm`.
+- Captured several high-signal CLI quirks in that batch, especially `ct2db`'s clean help/version path, `datatool`'s NCBI single-dash long-option style, `popt` relying on the embedded `RNAsubopt -s < seq | popt` contract, `clustalw2` entering an interactive menu on bare invocation, and `blst2gm` failing with an explicit `xtract` stdin error when no data is supplied.
+- Standardized and structurally validated 5 more EDirect / PMC helper skills: `blst2tkns`, `ecommon-sh`, `ecollect`, `pmc2info`, and `pmc2bioc`.
+- Captured several wrapper-critical behaviors in that batch, especially `blst2tkns` being a `Seq-align-set_E` tokenization recipe rather than a generic BLAST converter, `ecommon.sh` being source-only library code with silent direct execution, `ecollect`'s PubMed-specific `-count` / `-subset` modes plus sorted UID output, and both `pmc2info` / `pmc2bioc` depending on `xtract` / `transmute` and real PMC `<article>` XML.
+- Standardized and structurally validated 3 more transport / alignment helper skills: `nquire`, `analyse-dists`, and `alimask`.
+- Captured several environment-critical behaviors in that batch, especially `nquire`'s working EUtils GET path but failing FTP listing path, `AnalyseDists` using a capitalized executable name plus a singular typo in its usage string, and `alimask` being blocked by missing `libopenblas.so.0` while still exposing useful option text through `strings`.
+- Total structural backlog is now down to 48 skills still missing at least one house-style section.
+- Working cumulative estimate is now about 340 manually standardized skills.
+
+## 2026-03-27
+
+- Resumed manual skill standardization from prior bedtools-focused work.
+- Finished remaining bedtools wrappers and validated full bedtools family against the five-section standard.
+- Standardized `clustalw`, `iqtree3`, `hmmsim`, and `wgsim`.
+- Standardized legacy helper skills: `wgsim-eval-pl`, `vcfutils-pl`, `split-at-intron`, `samtools-pl`.
+- Standardized `STAR` / `STARlong` plain wrappers plus CPU-specific builds.
+- Standardized and structurally validated 11 ViennaRNA skills: `rnaplfold`, `rnaduplex`, `rnapdist`, `rnaup`, `rnasubopt`, `rnaeval`, `rnaplex`, `rnasnoop`, `rnapkplex`, `rnados`, `rnaparconv`.
+- Standardized and structurally validated 7 Bowtie2 wrapper skills: `bowtie2-align-l`, `bowtie2-align-s`, `bowtie2-build-l`, `bowtie2-build-s`, `bowtie2-inspect`, `bowtie2-inspect-l`, `bowtie2-inspect-s`.
+- Standardized and structurally validated 7 HISAT2 core wrapper skills: `hisat2-align-l`, `hisat2-align-s`, `hisat2-build-l`, `hisat2-build-s`, `hisat2-inspect`, `hisat2-inspect-l`, `hisat2-inspect-s`.
+- Standardized and structurally validated 6 HISAT2 helper skills: `hisat2-extract-exons-py`, `hisat2-extract-snps-haplotypes-ucsc-py`, `hisat2-extract-snps-haplotypes-vcf-py`, `hisat2-extract-splice-sites-py`, `hisat2-read-statistics-py`, `hisat2-simulate-reads-py`.
+- Standardized and structurally validated 8 Easel core skills: `esl-sfetch`, `esl-afetch`, `esl-reformat`, `esl-seqstat`, `esl-alistat`, `esl-alimask`, `esl-alimanip`, `esl-translate`.
+- Standardized and structurally validated 6 Easel alignment and comparison skills: `esl-alimap`, `esl-alimerge`, `esl-alipid`, `esl-alirev`, `esl-compalign`, `esl-compstruct`.
+- Standardized and structurally validated the remaining 9 Easel skills: `esl-construct`, `esl-histplot`, `esl-mask`, `esl-mixdchlet`, `esl-selectn`, `esl-seqrange`, `esl-shuffle`, `esl-ssdraw`, `esl-weight`.
+- Closed out the full current `esl-*` family at `REMAINING 0`.
+- Verified local runtime quirks for this batch, including the `esl-histplot` default-output mismatch, `esl-seqrange` 1-based worker indexing, `esl-shuffle -G` help/man disagreement, and `esl-weight` startup failure on missing `libopenblas.so.0`.
+- Standardized and structurally validated 4 HMMER profile utility skills: `hmmbuild`, `hmmconvert`, `hmmemit`, `hmmlogo`.
+- Standardized and structurally validated 2 HMMER daemon skills: `hmmpgmd`, `hmmpgmd-shard`.
+- Closed out the current HMMER family at `REMAINING 0` across `hmm*` plus `jackhmmer`, `nhmmer`, `nhmmscan`, and `phmmer`.
+- Verified local runtime quirks for the HMMER batch, including `hmmemit` multi-model library emission, `hmmlogo` table-style default output, and the shared-library startup failures affecting `hmmbuild`, `hmmpgmd`, and `hmmpgmd_shard`.
+- Standardized and structurally validated the remaining 2 Subread skills that still used generic docs: `subread-fullscan`, `sublong`.
+- Closed out the current Subread family at `REMAINING 0` across `feature-counts`, `subread-align`, `subread-buildindex`, `subread-fullscan`, `subjunc`, and `sublong`.
+- Verified Subread-specific CLI quirks for this batch, especially that `subread-fullscan` takes a literal read string and `sublong` expects a full one-block index.
+- Working cumulative estimate is now about 198 manually standardized skills.
+- Added persistent planning files to the project root so future batches can track status on disk.
+
+## Next Actions
+
+- Select the next cohesive high-value cluster outside the now-completed HISAT2, Easel, HMMER, Subread, archive-wrapper, UID-list, XML/JSON converter, and current helper families.
+- Continue preferring tools with real local executables, help text, or man pages over purely autogenerated summaries.
+- Preserve batch discipline: inspect runtime behavior first, patch the five standard sections, then run structural validation immediately.
+- Best next target is now the remaining lightly evidenced cluster around `analyse-seqs`, `b2ct`, `bioinformatics-toolkit`, `biomni`, and possibly `easel`, while continuing to defer opaque binary-only holdouts until there is stronger evidence to document them safely.
+
+## 2026-03-28
+
+- Standardized and structurally validated 4 more local helper skills: `xlink`, `xsearch`, `xa2multi-pl`, and `uniq-table`.
+- Reduced the five-section structural backlog from `20` remaining skills to `16`.
+- Corrected four stale autogenerated assumptions in this batch: `xsearch` is a local archive/postings search wrapper rather than a remote Entrez client, `xlink` resolves local link targets through `xlink.ini`, `xa2multi.pl` has no real help/version interface, and `uniq-table` removes invariant columns instead of deduplicating rows.
+- Captured live/runtime evidence for this batch, including the missing-`EDIRECT_LOCAL_ARCHIVE` failure path in `xsearch`, the current `xlink.ini` target mapping (`CITED`, `CITES`, `PMCID`), the exact secondary-alignment expansion behavior of `xa2multi.pl`, and the row-2 baseline rule inside `uniq-table`.
+- Working cumulative estimate is now about 368 manually standardized skills.
+- Standardized and structurally validated 4 more helper skills: `run-with-lock`, `seq-cache-populate-pl`, `subindel`, and `starlong`.
+- Reduced the five-section structural backlog again from `16` remaining skills to `12`.
+- Corrected four more stale autogenerated assumptions in this batch: `run_with_lock` is a broken-but-identifiable NCBI lock wrapper rather than a self-documenting generic helper, `seq_cache_populate.pl` builds MD5-keyed `REF_CACHE` trees rather than a loose FASTA cache, `subindel` exposes a usage-only interface with ambiguous output-prefix semantics, and `STARlong` in this environment is a CPU-dispatch wrapper rather than a single binary.
+- Captured live/runtime evidence for this batch, including the missing `get_lock` dependency in `run_with_lock`, real cache paths and `REF_CACHE` output from `seq_cache_populate.pl`, the invalid-`-h` / unrecognized-`--version` behavior of `subindel`, and the `bash -x` proof that `STARlong` selects `STARlong-avx2` on this host.
+- Working cumulative estimate is now about 372 manually standardized skills.
+- Standardized and structurally validated the final 4 concrete-CLI residual skills in the current backlog: `project-tree-builder`, `roh-viz`, `systematic-mutations`, and `vrfs-variances`.
+- Reduced the five-section structural backlog from `12` remaining skills to `8`, leaving only meta/project-style skills.
+- Corrected several high-value documentation traps in this batch: `roh-viz` actually requires `-i` for the ROH file even though its own example/error text says `-r`, `systematic-mutations` is a stdin-only `transmute` wrapper rather than an option-driven CLI, `vrfs-variances` mixes stdout/stderr outputs in default mode and can duplicate the terminal site in `-s` mode, and `project_tree_builder` can succeed silently on `-dryrun`.
+- Captured live/runtime evidence for this batch, including `project_tree_builder` version `4.12.3`, real `systematic-mutations` expansion output, reproducible `vrfs-variances` `MEAN/VAR2` and `-v` behavior on toy input, and the `roh-viz` parser mismatch between its true `-i` option and broken built-in example text.
+- Working cumulative estimate is now about 376 manually standardized skills.
+- Standardized and structurally validated the remaining 8 meta/project skills: `bioinformatics-toolkit`, `biomni`, `evo2`, `phage-design`, `protein-structure`, `rfdiffusion`, `sequence-analysis`, and `yeast_database`.
+- Closed the five-section structural backlog to `TOTAL_MISSING 0`.
+- Converted the last batch from vague autogenerated overviews into workspace-grounded gateway skills tied to real local assets under `repositories/active/` and `projects/`.
+- Captured critical environment reality in the final batch: Biomni top-level import works but deeper tool imports fail on missing `langchain_core`; Evo 2 import fails on missing `vortex` and its Docker image is not built; RFdiffusion repo is present but its image is not built; the yeast project is a teaching project whose real entrypoints are Bash scripts plus `pipeline.py --steps`.
+- Working cumulative estimate is now about 384 manually standardized skills.

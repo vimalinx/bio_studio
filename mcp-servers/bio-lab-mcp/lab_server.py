@@ -25,6 +25,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from lib.project_validation import required_tools_for_config
+from lib.service_api.models import RunCreateRequest
+from lib.service_api.planner import plan_request
 from lib.workspace_env import build_subprocess_env, resolve_workspace_python
 
 
@@ -179,6 +181,19 @@ def run_workspace_validation() -> dict[str, Any]:
     return _run_workspace_cli(["workspace-validate"])
 
 
+def preview_workspace_plan(
+    prompt: str,
+    requested_capabilities: list[str] | None = None,
+) -> dict[str, Any]:
+    request = RunCreateRequest(
+        prompt=prompt,
+        execution_mode="plan",
+        requested_capabilities=requested_capabilities or [],
+    )
+    preview = plan_request(request)
+    return preview.model_dump()
+
+
 def get_server_capabilities() -> dict[str, Any]:
     return {
         "server": "bio-lab-mcp",
@@ -191,6 +206,7 @@ def get_server_capabilities() -> dict[str, Any]:
             "get_project_steps",
             "run_project_validation",
             "run_workspace_validation",
+            "preview_workspace_plan",
         ],
     }
 
@@ -251,6 +267,25 @@ async def list_tools() -> list[Tool]:
             inputSchema={"type": "object", "properties": {}},
         ),
         Tool(
+            name="preview_workspace_plan",
+            description="预览自然语言请求会被如何拆解成 task brief、能力匹配和计划步骤",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "prompt": {
+                        "type": "string",
+                        "description": "自然语言任务描述",
+                    },
+                    "requested_capabilities": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "可选，显式要求的 capability id 列表",
+                    },
+                },
+                "required": ["prompt"],
+            },
+        ),
+        Tool(
             name="get_server_capabilities",
             description="返回 bio-lab-mcp 的当前能力和工作区入口信息",
             inputSchema={"type": "object", "properties": {}},
@@ -275,6 +310,11 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
             result = run_project_validation(arguments["project_name"])
         elif name == "run_workspace_validation":
             result = run_workspace_validation()
+        elif name == "preview_workspace_plan":
+            result = preview_workspace_plan(
+                arguments["prompt"],
+                arguments.get("requested_capabilities"),
+            )
         elif name == "get_server_capabilities":
             result = get_server_capabilities()
         else:

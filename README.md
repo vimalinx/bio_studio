@@ -105,6 +105,38 @@ cat claude-config.json
 - [mcp-servers/bio-structure-mcp/README.md](mcp-servers/bio-structure-mcp/README.md)
 - [mcp-servers/bio-database-mcp/README.md](mcp-servers/bio-database-mcp/README.md)
 
+## 在线 API 控制面
+
+如果你准备把这套工作区升级成在线服务，不建议重写现有骨架，而应该在现有 CLI / MCP / `projects/` 物化模型之上加一层控制面。
+
+已经补好的设计与实施入口：
+
+- [docs/superpowers/specs/2026-03-29-online-api-control-plane-design.md](docs/superpowers/specs/2026-03-29-online-api-control-plane-design.md)
+- [docs/superpowers/plans/2026-03-29-online-api-control-plane-phase-1.md](docs/superpowers/plans/2026-03-29-online-api-control-plane-phase-1.md)
+
+这条路线的核心原则是：
+
+- 保留 `scripts/project.py` 作为执行脊柱
+- 保留 `mcp-servers/` 作为工具接口层
+- 保留 `projects/` 作为可复现实验与产物边界
+- 新增 HTTP/API 层负责请求拆解、能力匹配、运行状态和工件索引
+
+当前已经落下一个最小可用入口 [scripts/api_server.py](scripts/api_server.py)，本地可直接启动：
+
+```bash
+python scripts/api_server.py
+```
+
+第一批可用端点：
+
+- `GET /healthz`
+- `GET /v1/capabilities`
+- `POST /v1/plans/preview`
+- `POST /v1/runs`
+- `GET /v1/runs/{run_id}`
+- `GET /v1/runs/{run_id}/events`
+- `GET /v1/runs/{run_id}/artifacts`
+
 ## 安全 CI 和发布护栏
 
 这个仓库现在已经接上最小、只读的 GitHub Actions 稳定测试链：

@@ -83,6 +83,7 @@ def test_list_tools_exposes_lab_workspace_operations() -> None:
     assert "get_project_steps" in names
     assert "run_project_validation" in names
     assert "run_workspace_validation" in names
+    assert "preview_workspace_plan" in names
     assert "get_server_capabilities" in names
 
 
@@ -206,6 +207,21 @@ def test_run_workspace_validation_invokes_workspace_cli(monkeypatch) -> None:
         str(ROOT / "scripts" / "project.py"),
         "workspace-validate",
     ]
+
+
+def test_preview_workspace_plan_returns_shared_planner_output() -> None:
+    module = _load_module("bio_lab_server_preview_plan_test")
+
+    result = module.preview_workspace_plan(
+        "analyze SARS-CoV-2 literature and sequence evidence",
+        ["workspace.project.validate"],
+    )
+
+    capability_ids = [item["capability_id"] for item in result["selected_capabilities"]]
+
+    assert result["brief"]["task_type"] == "analysis"
+    assert "database.search.pubmed" in capability_ids
+    assert "workspace.project.validate" in capability_ids
 
 
 def test_main_wrapper_uses_asyncio_run(monkeypatch) -> None:

@@ -1,0 +1,40 @@
+ebola:
+  geo_accession: GSE114905
+  label: Ebola virus
+  processed_file:
+    filename: GSE114905_RNA-476-477-478_EBOV_cells_D1-D3_GE_.xlsx
+    url: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE114nnn/GSE114905/suppl/GSE114905_RNA-476-477-478_EBOV_cells_D1-D3_GE_.xlsx
+  reference:
+    accession: NC_002549.1
+    download_by_default: true
+    filename: NC_002549.1.fa
+    url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=NC_002549.1&rettype=fasta&retmode=text
+  source_url: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE114905
+  title: Transcriptome in Huh7 cells infected with 4 Ebolaviruses
+sars_cov_2:
+  geo_accession: GSE147507
+  label: SARS-CoV-2
+  processed_file:
+    filename: GSE147507_RawReadCounts_Human.tsv.gz
+    url: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE147nnn/GSE147507/suppl/GSE147507_RawReadCounts_Human.tsv.gz
+  reference:
+    accession: NC_045512.2
+    download_by_default: true
+    filename: NC_045512.2.fa
+    url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=NC_045512.2&rettype=fasta&retmode=text
+  source_url: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE147507
+  title: SARS-CoV-2 launches a unique transcriptional signature from in vitro, ex
+    vivo, and in vivo systems
+yeast:
+  geo_accession: GSE67149
+  label: Saccharomyces cerevisiae
+  processed_file:
+    filename: GSE67149_Normalized_FPKM_Values.xlsx
+    url: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE67nnn/GSE67149/suppl/GSE67149_Normalized_FPKM_Values.xlsx
+  reference:
+    accession: SGD:S288C
+    download_by_default: false
+    filename: null
+    url: https://www.yeastgenome.org/strain/S288C
+  source_url: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE67149
+  title: Rpd3 drives transcriptional quiescence
